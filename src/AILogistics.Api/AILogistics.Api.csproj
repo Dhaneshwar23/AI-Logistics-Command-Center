@@ -7,7 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.27">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AILogistics.Application\AILogistics.Application.csproj" />
+    <ProjectReference Include="..\AILogistics.Domain\AILogistics.Domain.csproj" />
+    <ProjectReference Include="..\AILogistics.Infrastructure\AILogistics.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

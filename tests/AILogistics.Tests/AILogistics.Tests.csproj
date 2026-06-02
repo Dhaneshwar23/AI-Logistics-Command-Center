@@ -15,6 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AILogistics.Api\AILogistics.Api.csproj" />
+    <ProjectReference Include="..\..\src\AILogistics.Application\AILogistics.Application.csproj" />
+    <ProjectReference Include="..\..\src\AILogistics.Domain\AILogistics.Domain.csproj" />
+    <ProjectReference Include="..\..\src\AILogistics.Infrastructure\AILogistics.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
