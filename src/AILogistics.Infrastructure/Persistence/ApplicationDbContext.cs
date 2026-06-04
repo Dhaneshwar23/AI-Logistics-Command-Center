@@ -15,5 +15,6 @@ namespace AILogistics.Infrastructure.Persistence
         }
 
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Shipment> Shipment { get; set; }
     }
 }
