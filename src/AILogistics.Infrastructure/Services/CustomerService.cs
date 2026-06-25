@@ -1,4 +1,5 @@
 ﻿using AILogistics.Application.Customers;
+using AILogistics.Application.Interface;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

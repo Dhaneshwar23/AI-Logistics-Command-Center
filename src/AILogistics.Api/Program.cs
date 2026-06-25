@@ -1,4 +1,5 @@
-using AILogistics.Application.Customers;
+using AILogistics.Application.Interface;
+using AILogistics.Application.Interfaces;
 using AILogistics.Infrastructure.Persistence;
 using AILogistics.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
+builder.Services.AddScoped<ITrackingEventService, TrackingEventService>();
 
 var app = builder.Build();
 

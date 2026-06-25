@@ -1,11 +1,12 @@
-﻿using AILogistics.Domain.Entities;
+﻿using AILogistics.Application.Customers;
+using AILogistics.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AILogistics.Application.Customers
+namespace AILogistics.Application.Interface
 {
     public interface ICustomerService
     {

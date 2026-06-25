@@ -46,5 +46,7 @@ namespace AILogistics.Domain.Entities
 
         public Customer Customer { get; set; } = null!;
 
+        public ICollection<TrackingEvent> TrackingEvents { get; set; } =  new List<TrackingEvent>();
+
     }
 }

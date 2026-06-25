@@ -20,6 +20,8 @@ namespace AILogistics.Domain.Entities
         public string PostalCode { get; set; }
         public bool IsActive { get; set; }
 
+        public ICollection<Shipment> Shipments { get; set; } = new List<Shipment>();
+
 
     }
 }
