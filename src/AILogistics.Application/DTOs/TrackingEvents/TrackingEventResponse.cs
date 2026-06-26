@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AILogistics.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,7 @@ namespace AILogistics.Application.DTOs.TrackingEvents
         public string Description { get; set; }
         public DateTime EventTime { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public Shipment shipment { get; set; }
     }
 }

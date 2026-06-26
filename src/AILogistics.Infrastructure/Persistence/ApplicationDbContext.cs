@@ -27,7 +27,7 @@ namespace AILogistics.Infrastructure.Persistence
                 .HasForeignKey(s => s.CustomerId);
 
             modelBuilder.Entity<TrackingEvent>()
-                .HasOne(t => t.shipment)
+                .HasOne(t => t.Shipment)
                 .WithMany(s => s.TrackingEvents)
                 .HasForeignKey(t =>  t.ShipmentId);
         }

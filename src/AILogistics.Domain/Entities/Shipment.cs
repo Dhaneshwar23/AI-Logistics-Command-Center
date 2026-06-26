@@ -16,9 +16,12 @@ namespace AILogistics.Domain.Entities
     public enum ShipmentStatus
     {
         Pending = 0,
-        InTransit = 1,
-        Delivered = 2,
-        Cancelled = 3
+        PickedUp = 1,
+        InTransit = 2,
+        OutForDelivery = 3,
+        Delivered = 4,
+        Cancelled = 5,
+        Returned = 6
     }
 
     public enum ShipmentPriority 
