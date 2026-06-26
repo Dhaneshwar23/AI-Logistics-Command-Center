@@ -24,8 +24,8 @@ namespace AILogistics.Domain.Entities
         Returned = 6
     }
 
-    public enum ShipmentPriority 
-    { 
+    public enum ShipmentPriority
+    {
         Normal = 0,
         High = 1,
         Urgent = 2
@@ -33,12 +33,10 @@ namespace AILogistics.Domain.Entities
 
     public class Shipment : BaseEntity
     {
-
         public string ShipmentNumber { get; set; }
         public int CustomerId { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
-
         public decimal WeightKg { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public ShipmentStatus Status { get; set; }
@@ -46,10 +44,8 @@ namespace AILogistics.Domain.Entities
         public DateTime DeliveryDate { get; set; }
         public ShipmentPriority Priority { get; set; }
         public decimal DistanceKm { get; set; }
-
         public Customer Customer { get; set; } = null!;
-
-        public ICollection<TrackingEvent> TrackingEvents { get; set; } =  new List<TrackingEvent>();
+        public ICollection<TrackingEvent> TrackingEvents { get; set; } = new List<TrackingEvent>();
 
     }
 }

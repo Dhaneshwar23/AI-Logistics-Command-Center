@@ -32,8 +32,6 @@ namespace AILogistics.Infrastructure.Services
             }
             else
             {
-
-
                 var shipmentNumber = $"SHP-{DateTime.Now.Ticks}";
                 Shipment shipment = new Shipment();
 
@@ -93,7 +91,7 @@ namespace AILogistics.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (shipment == null)
             {
-                return null;
+                throw new Exception("Database Exploded");
             }
             return MapShipmentResponse(shipment, shipment.Customer);
 

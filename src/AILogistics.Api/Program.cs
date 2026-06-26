@@ -1,7 +1,9 @@
+using AILogistics.Api.Middleware;
 using AILogistics.Application.Interface;
 using AILogistics.Application.Interfaces;
 using AILogistics.Infrastructure.Persistence;
 using AILogistics.Infrastructure.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,8 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<ITrackingEventService, TrackingEventService>();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
