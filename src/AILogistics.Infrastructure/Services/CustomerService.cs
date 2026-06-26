@@ -1,4 +1,6 @@
 ﻿using AILogistics.Application.Customers;
+using AILogistics.Application.Exceptions;
+using AILogistics.Application.Interface;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -82,8 +84,10 @@ namespace AILogistics.Infrastructure.Services
                 };
                 return response;
             }
-
-            return null;
+            else
+            {
+                throw new NotFoundException("No customer found");
+            }
 
         }
 
