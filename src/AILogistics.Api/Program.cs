@@ -5,8 +5,17 @@ using AILogistics.Infrastructure.Persistence;
 using AILogistics.Infrastructure.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt",
+        rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -26,6 +35,8 @@ builder.Services.AddScoped<ITrackingEventService, TrackingEventService>();
 
 var app = builder.Build();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.

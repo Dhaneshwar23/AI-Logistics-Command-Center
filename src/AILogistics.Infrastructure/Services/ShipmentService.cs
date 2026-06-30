@@ -1,4 +1,5 @@
 ﻿using AILogistics.Application.DTOs.Shipments;
+using AILogistics.Application.Exceptions;
 using AILogistics.Application.Interfaces;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Persistence;
@@ -91,7 +92,7 @@ namespace AILogistics.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (shipment == null)
             {
-                throw new Exception("Database Exploded");
+                throw new NotFoundException("No Shipment Found");
             }
             return MapShipmentResponse(shipment, shipment.Customer);
 

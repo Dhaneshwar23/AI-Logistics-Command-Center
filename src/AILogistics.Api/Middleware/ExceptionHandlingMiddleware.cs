@@ -1,4 +1,5 @@
-﻿using AILogistics.Application.Exceptions;
+﻿using AILogistics.Api.Models;
+using AILogistics.Application.Exceptions;
 using System.Net;
 using System.Text.Json;
 
@@ -23,32 +24,42 @@ namespace AILogistics.Api.Middleware
             }
             catch (Exception ex)
             {
-                string message;
                 _logger.LogError(ex, "An unexpected error occurred");
 
-                context.Response.ContentType = "application/json";
+                ErrorResponse res = CreateErrorResponse(context, ex);
+                
+                await context.Response.WriteAsJsonAsync(res);
+            }
+        }
 
-                if (ex is NotFoundException)
-                {
+        private ErrorResponse CreateErrorResponse(HttpContext context, Exception ex)
+        {
+            string message = string.Empty;
+
+            context.Response.ContentType = "application/json";
+            switch (ex)
+            {
+                case NotFoundException:
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     message = ex.Message;
-                }
-                else
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    message = ex.Message; /*"An unexpected error occurred";*/
-                }
-                var response = new
-                {
-                    statusCode = context.Response.StatusCode,
-                    message,
-                    path = context.Request.Path,
-                    timestamp = DateTime.UtcNow
-                };
+                    break;
 
-                //var json = JsonSerializer.Serialize(response);
-                await context.Response.WriteAsJsonAsync(response);
+                default:
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    message = "An unexpected error occurred.";
+                    break;
             }
+
+            ErrorResponse response = new ErrorResponse
+            {
+                StatusCode = context.Response.StatusCode,
+                Message = message,
+                Path = context.Request.Path,
+                CorrelationId = context.Items["X-Correlation-ID"]?.ToString(),
+                TimeStamp = DateTime.UtcNow
+            };
+
+            return response;
         }
     }
 }
