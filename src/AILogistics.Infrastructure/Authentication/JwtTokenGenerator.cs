@@ -58,6 +58,7 @@ namespace AILogistics.Infrastructure.Authentication
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
                 signingCredentials: credentials
                 );
             string jwtString = new JwtSecurityTokenHandler().WriteToken(token);
@@ -66,7 +67,6 @@ namespace AILogistics.Infrastructure.Authentication
             {
                 Token = jwtString,
                 ExpiresAt = expiresAt
-
             };
             return jwtToken;
 
