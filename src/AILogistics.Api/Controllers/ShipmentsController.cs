@@ -1,5 +1,6 @@
 ﻿using AILogistics.Application.DTOs.Shipments;
 using AILogistics.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AILogistics.Api.Controllers
@@ -15,6 +16,7 @@ namespace AILogistics.Api.Controllers
             _shipmentService = shipmentService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetShipments()
         {

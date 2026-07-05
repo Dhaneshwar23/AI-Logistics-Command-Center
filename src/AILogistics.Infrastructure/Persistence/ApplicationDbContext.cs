@@ -17,6 +17,7 @@ namespace AILogistics.Infrastructure.Persistence
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Shipment> Shipment { get; set; }
         public DbSet<TrackingEvent> TrackingEvents { get; set; }
+        public DbSet<User> Users { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -30,6 +31,10 @@ namespace AILogistics.Infrastructure.Persistence
                 .HasOne(t => t.Shipment)
                 .WithMany(s => s.TrackingEvents)
                 .HasForeignKey(t =>  t.ShipmentId);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

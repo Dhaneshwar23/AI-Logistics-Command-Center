@@ -27,7 +27,7 @@ namespace AILogistics.Api.Middleware
                 _logger.LogError(ex, "An unexpected error occurred");
 
                 ErrorResponse res = CreateErrorResponse(context, ex);
-                
+
                 await context.Response.WriteAsJsonAsync(res);
             }
         }
@@ -39,11 +39,18 @@ namespace AILogistics.Api.Middleware
             context.Response.ContentType = "application/json";
             switch (ex)
             {
+                case ConflictException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    message = ex.Message;
+                    break;
                 case NotFoundException:
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     message = ex.Message;
                     break;
-
+                case AuthenticationException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    message = ex.Message;
+                    break;
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     message = "An unexpected error occurred.";
