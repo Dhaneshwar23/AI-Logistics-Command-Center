@@ -1,7 +1,11 @@
 name: Deploy API to Azure
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Build and Test API
+    types:
+      - completed
     branches:
       - master
 
@@ -11,7 +15,8 @@ env:
   API_PROJECT_PATH: ./src/AILogistics.Api/AILogistics.Api.csproj
 
 jobs:
-  build-test-deploy:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -26,14 +31,8 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build solution
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
-
       - name: Publish API
-        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --output ./publish --no-build
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --output ./publish
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
