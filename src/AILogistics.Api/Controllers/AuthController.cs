@@ -1,5 +1,6 @@
 ﻿using AILogistics.Application.DTOs.Authentication;
 using AILogistics.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AILogistics.Api.Controllers
@@ -15,6 +16,7 @@ namespace AILogistics.Api.Controllers
             _authService = authService;
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {

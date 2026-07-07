@@ -5,6 +5,7 @@ using AILogistics.Application.Interfaces;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Authentication;
 using AILogistics.Infrastructure.Persistence;
+using AILogistics.Infrastructure.Seed;
 using AILogistics.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,6 +39,8 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 var app = builder.Build();
+
+await app.SeedAdminUserAsync();
 
 app.UseCustomMiddlewares();
 

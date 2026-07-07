@@ -1,5 +1,6 @@
 ﻿using AILogistics.Application.Customers;
 using AILogistics.Application.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AILogistics.Api.Controllers

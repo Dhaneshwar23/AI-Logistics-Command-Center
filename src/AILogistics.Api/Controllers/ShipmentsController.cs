@@ -16,7 +16,7 @@ namespace AILogistics.Api.Controllers
             _shipmentService = shipmentService;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Customer")]
         [HttpGet]
         public async Task<IActionResult> GetShipments()
         {
