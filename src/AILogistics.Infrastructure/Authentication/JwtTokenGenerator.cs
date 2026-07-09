@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,17 +26,19 @@ namespace AILogistics.Infrastructure.Authentication
 
         public JwtTokenResultDto GenerateToken(User user)
         {
-            string jwtKey = _config["Jwt:Key"]
-                ?? throw new InvalidOperationException("Jwt Key is missing. ");
+            JwtSettings jwtSettings = new JwtSettings
+            {
+                SecretKey = _config["Jwt:Key"]
+                ?? throw new InvalidOperationException("Jwt Key is missing. "),
 
-            string issuer = _config["Jwt:Issuer"]
-                ?? throw new InvalidOperationException("Jwt issuer is missing. ");
+                Issuer = _config["Jwt:Issuer"]
+                ?? throw new InvalidOperationException("Jwt issuer is missing. "),
 
-            string audience = _config["Jwt:Audience"]
-                ?? throw new InvalidOperationException("Jwt Audience is missing. ");
+                Audience = _config["Jwt:Audience"]
+                ?? throw new InvalidOperationException("Jwt Audience is missing. "),
 
-            int expiresInMinutes = int.Parse(_config["Jwt:ExpiresInMinutes"] ?? "60");
-
+                AccessTokenExpiryMinutes = int.Parse(_config["Jwt:ExpiresInMinutes"] ?? "60")
+            };
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -44,7 +47,7 @@ namespace AILogistics.Infrastructure.Authentication
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
 
             var credentials = new SigningCredentials
             (
@@ -52,14 +55,15 @@ namespace AILogistics.Infrastructure.Authentication
                 SecurityAlgorithms.HmacSha256
                 );
 
-            var expiresAt = DateTime.UtcNow.AddMinutes(expiresInMinutes);
+            var expiresAt = DateTime.UtcNow.AddMinutes(jwtSettings.AccessTokenExpiryMinutes);
 
             var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
+                issuer: jwtSettings.Issuer,
+                audience: jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(jwtSettings.AccessTokenExpiryMinutes),
                 signingCredentials: credentials
+
                 );
             string jwtString = new JwtSecurityTokenHandler().WriteToken(token);
 
@@ -69,8 +73,17 @@ namespace AILogistics.Infrastructure.Authentication
                 ExpiresAt = expiresAt
             };
             return jwtToken;
+        }
 
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
 
+            using var rng = RandomNumberGenerator.Create();
+
+            rng.GetBytes(randomBytes);
+
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

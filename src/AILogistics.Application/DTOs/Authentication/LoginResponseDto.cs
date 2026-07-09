@@ -15,5 +15,7 @@ namespace AILogistics.Application.DTOs.Authentication
         public string FullName { get; set; }
         public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; }
+
+        public string RefreshToken { get; set; }
     }
 }

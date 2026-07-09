@@ -4,8 +4,10 @@ using AILogistics.Application.Exceptions;
 using AILogistics.Application.Interfaces;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Services;
+using Castle.Core.Configuration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -27,10 +29,17 @@ namespace AILogistics.Tests
             _userRepositoryMock = new Mock<IUserRepository>();
             _passwordHasherMock = new Mock<IPasswordHasher<User>>();
             _jwtTokenGeneratorMock = new Mock<IJwtTokenGenerator>();
+            var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:RefreshTokenExpiryDays"] = "7"
+            })
+            .Build();
             _authService = new AuthService(
                 _userRepositoryMock.Object,
                 _passwordHasherMock.Object,
-                _jwtTokenGeneratorMock.Object);
+                _jwtTokenGeneratorMock.Object,
+                configuration);
         }
 
         [Fact]
@@ -252,11 +261,11 @@ namespace AILogistics.Tests
             var res = await _authService.LoginAsync(request);
 
             _userRepositoryMock
-                .Verify( x => x.UpdateAsync(It.Is<User>(u => u.PasswordHash == "Rehashed-password"))
-                ,Times.Once());
+                .Verify(x => x.UpdateAsync(It.Is<User>(u => u.PasswordHash == "Rehashed-password"))
+                , Times.Once());
 
             _jwtTokenGeneratorMock
-                .Verify( j => j.GenerateToken(user),
+                .Verify(j => j.GenerateToken(user),
                 Times.Once());
 
             res.Should().NotBeNull();
@@ -266,6 +275,206 @@ namespace AILogistics.Tests
             res.Email.Should().Be("test@gmail.com");
             res.FullName.Should().Be("Test User");
             res.Role.Should().Be(UserRole.Customer);
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_ValidToken_ReturnsNewTokens()
+        {
+            var user = new User
+            {
+                Id = 1,
+                FullName = "Test User",
+                Email = "test@gmail.com",
+                PasswordHash = "hashed-password",
+                Role = UserRole.Customer
+            };
+            RefreshToken rfToken = new RefreshToken
+            {
+                Token = "THis is a token",
+                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                User = user,
+                UserId = user.Id,
+                RevokedAt = null,
+                ReplacedByToken = null
+            };
+
+            var jwtToken = new JwtTokenResultDto
+            {
+                Token = "Token",
+                ExpiresAt = DateTime.Today,
+            };
+
+            var request = new RefreshTokenRequestDto
+            {
+                RefreshToken = "This is a refresh token"
+            };
+
+            //string newGeneratedRefreshToken = "newToken";
+            _jwtTokenGeneratorMock
+                .Setup(x => x.GenerateRefreshToken())
+                .Returns("newToken");
+
+            _userRepositoryMock
+                .Setup(x => x.GetRefreshTokenAsync(request.RefreshToken))
+                .ReturnsAsync(rfToken);
+
+            _jwtTokenGeneratorMock
+                .Setup(j => j.GenerateToken(user))
+                .Returns(jwtToken);
+
+            //var newRefreshToken = await _authService.CreateRefreshToken(user,newGeneratedRefreshToken);
+            var res = await _authService.RefreshTokenAsync(request);
+            _userRepositoryMock
+                .Verify(x => x.AddRefreshTokenAsync(It.Is<RefreshToken>(rt =>
+                        rt.Token == "newToken" &&
+                        rt.UserId == user.Id &&
+                        rt.RevokedAt == null &&
+                        rt.ReplacedByToken == null
+                    )), Times.Once);
+
+            _userRepositoryMock
+                .Verify(x => x.SaveChangesAsync());
+
+            res.Token.Should().Be("Token");
+            res.ExpiresAt.Should().Be(DateTime.Today);
+            res.RefreshToken.Should().Be("newToken");
+            rfToken.RevokedAt.Should().NotBeNull();
+            rfToken.ReplacedByToken.Should().NotBeNull();
+            res.UserId.Should().Be(user.Id);
+            res.FullName.Should().Be(user.FullName);
+            res.Email.Should().Be(user.Email);
+            res.Role.Should().Be(user.Role);
+
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_InvalidToken_ThrowsAuthenticationException()
+        {
+            var request = new RefreshTokenRequestDto
+            {
+                RefreshToken = "This is a refresh token"
+            };
+
+            _userRepositoryMock
+                .Setup(u => u.GetRefreshTokenAsync(request.RefreshToken))
+                .ReturnsAsync((RefreshToken?)null);
+
+            Func<Task> act = async () => await _authService.RefreshTokenAsync(request);
+
+            await act.Should().ThrowAsync<AuthenticationException>();
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_ExpiredToken_ThrowsAuthenticationException()
+        {
+            var request = new RefreshTokenRequestDto
+            {
+                RefreshToken = "This is a refresh token"
+            };
+
+            var user = new User
+            {
+                Id = 1,
+                FullName = "Test User",
+                Email = "test@gmail.com",
+                PasswordHash = "hashed-password",
+                Role = UserRole.Customer
+            };
+
+            RefreshToken rfToken = new RefreshToken
+            {
+                Token = "THis is a token",
+                ExpiresAt = DateTime.UtcNow.AddDays(-1),
+                User = user,
+                UserId = user.Id,
+                RevokedAt = null,
+                ReplacedByToken = null
+            };
+
+            _userRepositoryMock
+                .Setup(u => u.GetRefreshTokenAsync(request.RefreshToken))
+                .ReturnsAsync(rfToken);
+
+            Func<Task> act = async () => await _authService.RefreshTokenAsync(request);
+
+            await act.Should().ThrowAsync<AuthenticationException>();
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_RevokedToken_ThrowsAuthenticationException()
+        {
+            var request = new RefreshTokenRequestDto
+            {
+                RefreshToken = "This is a refresh token"
+            };
+
+            var user = new User
+            {
+                Id = 1,
+                FullName = "Test User",
+                Email = "test@gmail.com",
+                PasswordHash = "hashed-password",
+                Role = UserRole.Customer
+            };
+
+            RefreshToken rfToken = new RefreshToken
+            {
+                Token = "THis is a token",
+                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                User = user,
+                UserId = user.Id,
+                RevokedAt = DateTime.UtcNow.AddDays(-2),
+                ReplacedByToken = null
+            };
+
+            _userRepositoryMock
+                .Setup(u => u.GetRefreshTokenAsync(request.RefreshToken))
+                .ReturnsAsync(rfToken);
+
+            Func<Task> act = async () => await _authService.RefreshTokenAsync(request);
+
+            await act.Should().ThrowAsync<AuthenticationException>();
+
+        }
+
+        [Fact]
+        public async Task LogoutAsync_ValidToken_RevokesToken()
+        {
+            var request = new RefreshTokenRequestDto
+            {
+                RefreshToken = "This is a refresh token"
+            };
+
+            var user = new User
+            {
+                Id = 1,
+                FullName = "Test User",
+                Email = "test@gmail.com",
+                PasswordHash = "hashed-password",
+                Role = UserRole.Customer
+            };
+
+            RefreshToken rfToken = new RefreshToken
+            {
+                Token = "THis is a token",
+                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                User = user,
+                UserId = user.Id,
+                RevokedAt = null,
+                ReplacedByToken = null
+            };
+            _userRepositoryMock
+                .Setup(x => x.GetRefreshTokenAsync(request.RefreshToken))
+                .ReturnsAsync(rfToken);
+
+            //rfToken.RevokedAt = DateTime.UtcNow;
+            await _authService.LogoutAsync(request);
+
+            rfToken.RevokedAt.Should().NotBeNull();
+
+            _userRepositoryMock
+                .Verify(x => x.SaveChangesAsync(),
+                Times.Once);
         }
     }
 }

@@ -7,6 +7,7 @@ using AILogistics.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +21,17 @@ namespace AILogistics.Infrastructure.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly IConfiguration _configuration;
 
         public AuthService(IUserRepository userRepository,
             IPasswordHasher<User> passwordHasher,
-            IJwtTokenGenerator jwtTokenGenerator)
+            IJwtTokenGenerator jwtTokenGenerator,
+            IConfiguration configuration)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _jwtTokenGenerator = jwtTokenGenerator;
+            _configuration = configuration;
         }
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
         {
@@ -54,10 +58,18 @@ namespace AILogistics.Infrastructure.Services
 
                 JwtTokenResultDto jwtToken = _jwtTokenGenerator.GenerateToken(user);
 
+                string generatedRefreshToken = _jwtTokenGenerator.GenerateRefreshToken();
+
+                RefreshToken refreshToken = await CreateRefreshToken(user, generatedRefreshToken);
+
+                await _userRepository.AddRefreshTokenAsync(refreshToken);
+                await _userRepository.SaveChangesAsync();
+
                 LoginResponseDto response = new LoginResponseDto
                 {
                     Token = jwtToken.Token,
                     ExpiresAt = jwtToken.ExpiresAt,
+                    RefreshToken = generatedRefreshToken,
                     UserId = user.Id,
                     FullName = user.FullName,
                     Email = user.Email,
@@ -94,6 +106,93 @@ namespace AILogistics.Infrastructure.Services
 
                 await _userRepository.AddAsync(user);
             }
+        }
+
+        public async Task<RefreshToken> CreateRefreshToken(User user, string generatedRefreshToken)
+        {
+            int refreshTokenExpiryDays = int.Parse(_configuration["Jwt:RefreshTokenExpiryDays"]);
+
+            RefreshToken rfToken = new RefreshToken
+            {
+                Token = generatedRefreshToken,
+                ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpiryDays),
+                UserId = user.Id,
+                RevokedAt = null,
+                ReplacedByToken = null,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            return rfToken;
+        }
+
+        public async Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request)
+        {
+            RefreshToken? refreshToken = await _userRepository.GetRefreshTokenAsync(request.RefreshToken);
+
+            if (refreshToken == null)
+            {
+                throw new AuthenticationException("Invalid refresh token.");
+            }
+            else if (refreshToken.IsExpired)
+            {
+                throw new AuthenticationException($"Refresh token has expired.");
+            }
+            else if (refreshToken.IsRevoked)
+            {
+                throw new AuthenticationException($"Refresh token has been revoked. ");
+            }
+            else
+            {
+                User user = refreshToken.User;
+
+                string newGeneratedRefreshToken = _jwtTokenGenerator.GenerateRefreshToken();
+
+                refreshToken.RevokedAt = DateTime.UtcNow;
+                refreshToken.ReplacedByToken = newGeneratedRefreshToken;
+
+                JwtTokenResultDto jwtToken = _jwtTokenGenerator.GenerateToken(user);
+
+                RefreshToken newRefreshToken = await CreateRefreshToken(user, newGeneratedRefreshToken);
+
+                await _userRepository.AddRefreshTokenAsync(newRefreshToken);
+                await _userRepository.SaveChangesAsync();
+
+                LoginResponseDto response = new LoginResponseDto
+                {
+                    Token = jwtToken.Token,
+                    ExpiresAt = jwtToken.ExpiresAt,
+                    RefreshToken = newGeneratedRefreshToken,
+                    UserId = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    Role = user.Role,
+                };
+
+                return response;
+            }
+        }
+
+        public async Task LogoutAsync(RefreshTokenRequestDto request)
+        {
+            RefreshToken? refreshToken = await _userRepository.GetRefreshTokenAsync(request.RefreshToken);
+            if (refreshToken == null)
+            {
+                throw new AuthenticationException("Invalid refresh token. ");
+            }
+            else if(refreshToken.IsExpired)
+            {
+                throw new AuthenticationException("Refresh token has expired. ");
+            }
+            else if (refreshToken.IsRevoked)
+            {
+                throw new AuthenticationException("Refresh token has already been revoked. ");
+            }
+            else
+            {
+                refreshToken.RevokedAt = DateTime.UtcNow;
+                await _userRepository.SaveChangesAsync();
+            }
+
         }
     }
 }
