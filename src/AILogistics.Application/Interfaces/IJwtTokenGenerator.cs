@@ -11,5 +11,7 @@ namespace AILogistics.Application.Interfaces
     public interface IJwtTokenGenerator
     {
         JwtTokenResultDto GenerateToken(User user);
+
+        String GenerateRefreshToken();
     }
 }

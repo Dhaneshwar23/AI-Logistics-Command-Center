@@ -18,6 +18,8 @@ namespace AILogistics.Infrastructure.Persistence
         public DbSet<Shipment> Shipment { get; set; }
         public DbSet<TrackingEvent> TrackingEvents { get; set; }
         public DbSet<User> Users { get; set; }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,6 +37,12 @@ namespace AILogistics.Infrastructure.Persistence
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany( u => u.RefreshTokens)
+                .HasForeignKey( rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using AILogistics.Application.DTOs.Authentication;
+﻿using AILogistics.Application.DTOs;
+using AILogistics.Application.DTOs.Authentication;
+using AILogistics.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +13,8 @@ namespace AILogistics.Application.Interfaces
     {
         Task RegisterAsync(RegisterRequestDto request);
         Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request);
+        Task LogoutAsync(RefreshTokenRequestDto request);
+
     }
 }

@@ -18,5 +18,7 @@ namespace AILogistics.Domain.Entities
         public string Email { get; set; }   
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; } = UserRole.Customer;
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

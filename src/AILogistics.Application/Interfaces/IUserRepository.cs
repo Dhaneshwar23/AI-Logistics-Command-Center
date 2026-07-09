@@ -14,5 +14,9 @@ namespace AILogistics.Application.Interfaces
         Task AddAsync(User user);
         Task<bool> EmailExistsAsync(string email);
         Task UpdateAsync(User user);
+        Task AddRefreshTokenAsync(RefreshToken refreshToken);
+        Task<RefreshToken?> GetRefreshTokenAsync(string token);
+        Task UpdateRefreshToken(RefreshToken refreshToken);
+        Task<int> SaveChangesAsync();
     }
 }

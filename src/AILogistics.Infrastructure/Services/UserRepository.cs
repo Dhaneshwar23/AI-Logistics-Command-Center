@@ -45,7 +45,7 @@ namespace AILogistics.Infrastructure.Services
 
         public async Task UpdateAsync(User user)
         {
-            User? existingUser = await _context.Users.FirstOrDefaultAsync(u=> u.Id == user.Id);
+            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
             if (existingUser != null)
             {
                 existingUser.FullName = user.FullName;
@@ -59,5 +59,29 @@ namespace AILogistics.Infrastructure.Services
                 throw new NotFoundException("User not found");
             }
         }
+        public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            await _context.RefreshTokens.AddAsync(refreshToken);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<RefreshToken?> GetRefreshTokenAsync(string token)
+        {
+            return await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == token);
+        }
+
+        public Task UpdateRefreshToken(RefreshToken refreshToken)
+        {
+            _context.RefreshTokens.Update(refreshToken);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+
     }
 }
