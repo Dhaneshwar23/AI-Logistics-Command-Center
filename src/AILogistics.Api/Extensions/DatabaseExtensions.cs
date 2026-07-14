@@ -10,7 +10,14 @@ namespace AILogistics.Api.Extensions
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 6,
+                            maxRetryDelay: TimeSpan.FromSeconds(20),
+                            errorNumbersToAdd: null);
+                    });
 
             });
             return services;

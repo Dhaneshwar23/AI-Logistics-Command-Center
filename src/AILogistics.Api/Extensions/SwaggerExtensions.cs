@@ -5,6 +5,9 @@
         public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
         {
             services.AddEndpointsApiExplorer();
+
+            services.ConfigureOptions<ConfigureSwaggerOptions>();
+
             services.AddSwaggerGen(c =>
             {
 

@@ -4,6 +4,7 @@ using AILogistics.Application.Interface;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,11 @@ namespace AILogistics.Infrastructure.Services
     public class CustomerService : ICustomerService
     {
         private readonly ApplicationDbContext _context;
-
-        public CustomerService(ApplicationDbContext context)
+        private readonly ILogger<CustomerService> _logger;
+        public CustomerService(ApplicationDbContext context, ILogger<CustomerService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<CustomerResponse> CreateCustomer(CreateCustomerRequest request)
@@ -93,6 +95,10 @@ namespace AILogistics.Infrastructure.Services
 
         public async Task<List<CustomerResponse>> GetCustomers()
         {
+            _logger.LogInformation(
+                "Fetching customers from database at {Time}",
+                DateTime.UtcNow);
+
             List<Customer> customers = await _context.Customers.ToListAsync();
 
             List<CustomerResponse> customerList = new List<CustomerResponse>();

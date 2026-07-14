@@ -1,14 +1,20 @@
-﻿using AILogistics.Application.DTOs;
+﻿using AILogistics.Api.Extensions;
+using AILogistics.Application.DTOs;
 using AILogistics.Application.DTOs.Authentication;
 using AILogistics.Application.Interfaces;
 using AILogistics.Domain.Entities;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AILogistics.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [EnableRateLimiting(
+    RateLimitingExtensions.AuthenticationPolicy)]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;

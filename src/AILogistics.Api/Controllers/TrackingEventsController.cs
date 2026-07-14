@@ -1,11 +1,17 @@
-﻿using AILogistics.Application.DTOs.TrackingEvents;
+﻿using AILogistics.Api.Extensions;
+using AILogistics.Api.Filters;
+using AILogistics.Application.DTOs.TrackingEvents;
 using AILogistics.Application.Interfaces;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.RateLimiting;
 namespace AILogistics.Api.Controllers
 
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class TrackingEventsController : ControllerBase
     {
         private readonly ITrackingEventService _trackingEventService;
@@ -16,6 +22,8 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
+           Tags = new[] { OutputCachingExtensions.TrackingEventsTag } )]
         public async Task<IActionResult> GetAllTrackingEvents()
         {
             List<TrackingEventResponse> trackingEventResponses = await _trackingEventService.GetAllTrackingEvents();
@@ -30,6 +38,8 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
+           Tags = new[] { OutputCachingExtensions.TrackingEventsTag })]
         public async Task<IActionResult> GetTrackingEventById(int id)
         {
             if (id <= 0)
@@ -49,6 +59,8 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpGet("shipment/{shipmentId}")]
+        [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
+           Tags = new[] { OutputCachingExtensions.TrackingEventsTag })]
         public async Task<IActionResult> GetTrackingEventsByShipmentId(int shipmentId)
         {
             if (shipmentId <= 0)
@@ -68,6 +80,7 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpPost]
+        [InvalidateOutputCache(OutputCachingExtensions.TrackingEventsTag)]
         public async Task<IActionResult> CreateTrackingEvent(CreateTrackingEvent request)
         {
             if (request == null)
