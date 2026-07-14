@@ -1,12 +1,18 @@
-﻿using AILogistics.Application.DTOs.Shipments;
+﻿using AILogistics.Api.Extensions;
+using AILogistics.Api.Filters;
+using AILogistics.Application.DTOs.Shipments;
 using AILogistics.Application.Interfaces;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AILogistics.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ShipmentsController : ControllerBase
     {
         private readonly IShipmentService _shipmentService;
@@ -18,6 +24,8 @@ namespace AILogistics.Api.Controllers
 
         [Authorize(Roles = "Customer")]
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
+            Tags = new[] { OutputCachingExtensions.ShipmentTag })]
         public async Task<IActionResult> GetShipments()
         {
             List<ShipmentResponse> shipmentResponses = await _shipmentService.GetAllShipments();
@@ -26,6 +34,8 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
+            Tags = new[] { OutputCachingExtensions.ShipmentTag })]
         public async Task<IActionResult> GetShipmentById(int id)
         {
             if (id <= 0)
@@ -47,6 +57,8 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpGet("by-number/{shipmentNumber}")]
+        [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
+            Tags = new[] { OutputCachingExtensions.ShipmentTag })]
         public async Task<IActionResult> GetShipmentByShipmentNumber(string shipmentNumber)
         {
             if (string.IsNullOrEmpty(shipmentNumber))
@@ -65,6 +77,7 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpPost]
+        [InvalidateOutputCache(OutputCachingExtensions.ShipmentTag)]
         public async Task<IActionResult> CreateShipment(CreateShipment request)
         {
             if (request == null)
@@ -80,6 +93,7 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpPut("{shipmentId}")]
+        [InvalidateOutputCache(OutputCachingExtensions.ShipmentTag)]
         public async Task<IActionResult> UpdateShipment(int shipmentId, UpdateShipment request)
         {
             if (request == null || shipmentId <= 0)
@@ -99,6 +113,7 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpDelete("{shipmentId}")]
+        [InvalidateOutputCache(OutputCachingExtensions.ShipmentTag)]
         public async Task<IActionResult> DeleteShipment(int shipmentId)
         {
             if (shipmentId <= 0)

@@ -10,6 +10,7 @@ using AILogistics.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -38,23 +39,75 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddApplicationServices();
 
+builder.Services.AddApiVersioningConfiguration();
+
+builder.Services.AddRateLimitingConfiguration(builder.Configuration);
+
+builder.Services.AddHealthCheckConfiguration();
+
+builder.Services.AddCorsConfiguration(builder.Configuration);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+});
+
+builder.Services.AddResponseCompressionConfiguration();
+
+builder.Services.AddOutputCacheConfiguration();
+
 var app = builder.Build();
 
-await app.SeedAdminUserAsync();
+await app.InitializeDatabaseAsync();
 
 app.UseCustomMiddlewares();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+if (builder.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerDocumentation();
+}
+
+if(!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
+app.UseCors(CorsExtensions.PolicyName);
+
 app.UseAuthentication();
+
+app.UseRateLimiter();
+
 app.UseAuthorization();
+
+app.UseOutputCache();
+
+app.MapHealthChecks(
+    "/health/live",
+    new HealthCheckOptions
+    {
+        Predicate = check =>
+                        check.Tags.Contains("live"),
+        ResponseWriter = (context, report) => HealthCheckResponseWriter.WriteResponseAsync(context,
+                                                                                            report,
+                                                                                            app.Environment.IsDevelopment())
+    })
+    .DisableRateLimiting();
+
+app.MapHealthChecks(
+    "/health/ready",
+    new HealthCheckOptions
+    {
+        Predicate = check =>
+                        check.Tags.Contains("ready"),
+        ResponseWriter = (context, report) => HealthCheckResponseWriter.WriteResponseAsync(context,
+                                                                                            report,
+                                                                                            app.Environment.IsDevelopment())
+    })
+    .DisableRateLimiting();
 
 app.MapControllers();
 

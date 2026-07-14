@@ -3,6 +3,7 @@ using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Persistence;
 using AILogistics.Infrastructure.Seed;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AILogistics.Api.Extensions
 {
@@ -14,22 +15,11 @@ namespace AILogistics.Api.Extensions
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseMiddleware<SecurityHeadersMiddleware>();
+
+            app.UseResponseCompression();
 
             return app;
-        }
-
-        public static async Task SeedAdminUserAsync(this WebApplication app)
-        {
-            using var scope = app.Services.CreateScope();
-
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
-            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-            await AdminUserSeeder.SeedAdminAsync(
-                dbContext,
-                passwordHasher,
-                configuration);
         }
     }
 }
