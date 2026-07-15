@@ -39,6 +39,7 @@ namespace AILogistics.Api.Controllers
             }
         }
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
             if (request == null)
@@ -50,6 +51,7 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpPost("refreshToken")]
+        [AllowAnonymous]
         public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto request)
         {
             if (request == null)
@@ -64,6 +66,7 @@ namespace AILogistics.Api.Controllers
         }
 
         [HttpPost("logout")]
+        [AllowAnonymous]
         public async Task<IActionResult> Logout(RefreshTokenRequestDto request)
         {
             if(request == null)

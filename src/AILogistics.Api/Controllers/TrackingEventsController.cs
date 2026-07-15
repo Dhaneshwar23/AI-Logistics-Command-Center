@@ -3,7 +3,9 @@ using AILogistics.Api.Filters;
 using AILogistics.Application.DTOs.TrackingEvents;
 using AILogistics.Application.Interfaces;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AILogistics.Application.Common;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
 namespace AILogistics.Api.Controllers
@@ -12,6 +14,7 @@ namespace AILogistics.Api.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(Policy = AuthenticationExtensions.OperationsPolicy)]
     public class TrackingEventsController : ControllerBase
     {
         private readonly ITrackingEventService _trackingEventService;
@@ -24,17 +27,10 @@ namespace AILogistics.Api.Controllers
         [HttpGet]
         [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
            Tags = new[] { OutputCachingExtensions.TrackingEventsTag } )]
-        public async Task<IActionResult> GetAllTrackingEvents()
+        public async Task<IActionResult> GetAllTrackingEvents([FromQuery] PaginationRequest pagination, CancellationToken cancellationToken)
         {
-            List<TrackingEventResponse> trackingEventResponses = await _trackingEventService.GetAllTrackingEvents();
-            if (!trackingEventResponses.Any())
-            {
-                return NotFound();
-            }
-            else
-            {
-                return Ok(trackingEventResponses);
-            }
+            var trackingEventResponses = await _trackingEventService.GetAllTrackingEvents(pagination, cancellationToken);
+            return Ok(trackingEventResponses);
         }
 
         [HttpGet("{id:int}")]
@@ -79,6 +75,7 @@ namespace AILogistics.Api.Controllers
 
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost]
         [InvalidateOutputCache(OutputCachingExtensions.TrackingEventsTag)]
         public async Task<IActionResult> CreateTrackingEvent(CreateTrackingEvent request)

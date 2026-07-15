@@ -29,6 +29,22 @@ namespace AILogistics.Infrastructure.Persistence
                 .WithMany(c => c.Shipments)
                 .HasForeignKey(s => s.CustomerId);
 
+            modelBuilder.Entity<Shipment>()
+                .Property(s => s.ShipmentNumber)
+                .HasMaxLength(40);
+
+            modelBuilder.Entity<Shipment>()
+                .HasIndex(s => s.ShipmentNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<Shipment>()
+                .Property(s => s.WeightKg)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Shipment>()
+                .Property(s => s.DistanceKm)
+                .HasPrecision(18, 2);
+
             modelBuilder.Entity<TrackingEvent>()
                 .HasOne(t => t.Shipment)
                 .WithMany(s => s.TrackingEvents)

@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
+using AILogistics.Application.Common;
 
 namespace AILogistics.Api.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(Policy = AuthenticationExtensions.OperationsPolicy)]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -25,6 +27,7 @@ namespace AILogistics.Api.Controllers
             _outputCacheStore = outputCacheStore;
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [InvalidateOutputCache(OutputCachingExtensions.CustomersTag)]
         public async Task<IActionResult> CreateCustomer(CreateCustomerRequest customer)
@@ -58,16 +61,17 @@ namespace AILogistics.Api.Controllers
         [HttpGet]
         [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
             Tags = new[] {OutputCachingExtensions.CustomersTag})]
-        public async Task<IActionResult> GetCustomers()
+        public async Task<IActionResult> GetCustomers([FromQuery] PaginationRequest pagination, CancellationToken cancellationToken)
         {
-            List<CustomerResponse> customers = await _customerService.GetCustomers();
+            var customers = await _customerService.GetCustomers(pagination, cancellationToken);
 
             return Ok(customers);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("{customerId}")]
         [InvalidateOutputCache(OutputCachingExtensions.CustomersTag)]
-        public async Task<IActionResult> UpdateCustomer(CreateCustomerRequest request, int customerId)
+        public async Task<IActionResult> UpdateCustomer(UpdateCustomerRequest request, int customerId)
         {
             if (request == null)
             {
@@ -85,6 +89,7 @@ namespace AILogistics.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{customerId}")]
         [InvalidateOutputCache(OutputCachingExtensions.CustomersTag)]
         public async Task<IActionResult> DeleteCustomer(int customerId)

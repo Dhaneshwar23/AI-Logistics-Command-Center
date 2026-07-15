@@ -58,7 +58,10 @@ builder.Services.AddOutputCacheConfiguration();
 
 var app = builder.Build();
 
-await app.InitializeDatabaseAsync();
+if (app.Environment.IsDevelopment())
+{
+    await app.InitializeDatabaseAsync();
+}
 
 app.UseCustomMiddlewares();
 
@@ -95,7 +98,8 @@ app.MapHealthChecks(
                                                                                             report,
                                                                                             app.Environment.IsDevelopment())
     })
-    .DisableRateLimiting();
+    .DisableRateLimiting()
+    .AllowAnonymous();
 
 app.MapHealthChecks(
     "/health/ready",
@@ -107,7 +111,8 @@ app.MapHealthChecks(
                                                                                             report,
                                                                                             app.Environment.IsDevelopment())
     })
-    .DisableRateLimiting();
+    .DisableRateLimiting()
+    .AllowAnonymous();
 
 app.MapControllers();
 

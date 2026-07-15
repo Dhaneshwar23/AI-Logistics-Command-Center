@@ -20,6 +20,9 @@ namespace AILogistics.Domain.Entities
         public string PostalCode { get; set; }
         public bool IsActive { get; set; }
 
+        [System.ComponentModel.DataAnnotations.Timestamp]
+        public byte[] RowVersion { get; set; } = Array.Empty<byte>();
+
         public ICollection<Shipment> Shipments { get; set; } = new List<Shipment>();
 
 

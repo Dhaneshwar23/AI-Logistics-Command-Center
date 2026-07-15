@@ -44,6 +44,8 @@ namespace AILogistics.Domain.Entities
         public DateTime DeliveryDate { get; set; }
         public ShipmentPriority Priority { get; set; }
         public decimal DistanceKm { get; set; }
+        [System.ComponentModel.DataAnnotations.Timestamp]
+        public byte[] RowVersion { get; set; } = Array.Empty<byte>();
         public Customer Customer { get; set; } = null!;
         public ICollection<TrackingEvent> TrackingEvents { get; set; } = new List<TrackingEvent>();
 
