@@ -18,7 +18,5 @@ namespace AILogistics.Application.DTOs.TrackingEvents
         public string Description { get; set; }
         public DateTime EventTime { get; set; }
         public DateTime CreatedAt { get; set; }
-
-        public Shipment shipment { get; set; }
     }
 }

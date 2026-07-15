@@ -1,7 +1,7 @@
 ﻿using AILogistics.Application.DTOs;
 using AILogistics.Application.Interfaces;
 using AILogistics.Domain.Entities;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -10,35 +10,21 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AILogistics.Infrastructure.Authentication
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
-        private readonly IConfiguration _config;
+        private readonly JwtOptions _options;
 
-        public JwtTokenGenerator(IConfiguration config)
+        public JwtTokenGenerator(IOptions<JwtOptions> options)
         {
-            _config = config;
+            _options = options.Value;
         }
 
         public JwtTokenResultDto GenerateToken(User user)
         {
-            JwtSettings jwtSettings = new JwtSettings
-            {
-                SecretKey = _config["Jwt:Key"]
-                ?? throw new InvalidOperationException("Jwt Key is missing. "),
-
-                Issuer = _config["Jwt:Issuer"]
-                ?? throw new InvalidOperationException("Jwt issuer is missing. "),
-
-                Audience = _config["Jwt:Audience"]
-                ?? throw new InvalidOperationException("Jwt Audience is missing. "),
-
-                AccessTokenExpiryMinutes = int.Parse(_config["Jwt:ExpiresInMinutes"] ?? "60")
-            };
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -47,7 +33,7 @@ namespace AILogistics.Infrastructure.Authentication
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 
             var credentials = new SigningCredentials
             (
@@ -55,13 +41,13 @@ namespace AILogistics.Infrastructure.Authentication
                 SecurityAlgorithms.HmacSha256
                 );
 
-            var expiresAt = DateTime.UtcNow.AddMinutes(jwtSettings.AccessTokenExpiryMinutes);
+            var expiresAt = DateTime.UtcNow.AddMinutes(_options.AccessTokenExpiryMinutes);
 
             var token = new JwtSecurityToken(
-                issuer: jwtSettings.Issuer,
-                audience: jwtSettings.Audience,
+                issuer: _options.Issuer,
+                audience: _options.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(jwtSettings.AccessTokenExpiryMinutes),
+                expires: expiresAt,
                 signingCredentials: credentials
 
                 );

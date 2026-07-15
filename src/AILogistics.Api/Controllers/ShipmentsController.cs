@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
+using AILogistics.Application.Common;
 
 namespace AILogistics.Api.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(Policy = AuthenticationExtensions.OperationsPolicy)]
     public class ShipmentsController : ControllerBase
     {
         private readonly IShipmentService _shipmentService;
@@ -22,13 +24,12 @@ namespace AILogistics.Api.Controllers
             _shipmentService = shipmentService;
         }
 
-        [Authorize(Roles = "Customer")]
         [HttpGet]
         [OutputCache(PolicyName = OutputCachingExtensions.GeneralPolicy,
             Tags = new[] { OutputCachingExtensions.ShipmentTag })]
-        public async Task<IActionResult> GetShipments()
+        public async Task<IActionResult> GetShipments([FromQuery] PaginationRequest pagination, CancellationToken cancellationToken)
         {
-            List<ShipmentResponse> shipmentResponses = await _shipmentService.GetAllShipments();
+            var shipmentResponses = await _shipmentService.GetAllShipments(pagination, cancellationToken);
 
             return Ok(shipmentResponses);
         }
@@ -75,7 +76,7 @@ namespace AILogistics.Api.Controllers
                 return Ok(shipmentResponse);
             }
         }
-
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost]
         [InvalidateOutputCache(OutputCachingExtensions.ShipmentTag)]
         public async Task<IActionResult> CreateShipment(CreateShipment request)
@@ -92,6 +93,7 @@ namespace AILogistics.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("{shipmentId}")]
         [InvalidateOutputCache(OutputCachingExtensions.ShipmentTag)]
         public async Task<IActionResult> UpdateShipment(int shipmentId, UpdateShipment request)
@@ -112,6 +114,7 @@ namespace AILogistics.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpDelete("{shipmentId}")]
         [InvalidateOutputCache(OutputCachingExtensions.ShipmentTag)]
         public async Task<IActionResult> DeleteShipment(int shipmentId)

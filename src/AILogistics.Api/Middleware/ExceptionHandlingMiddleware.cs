@@ -51,6 +51,10 @@ namespace AILogistics.Api.Middleware
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     message = ex.Message;
                     break;
+                case ConcurrencyException:
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    message = ex.Message;
+                    break;
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     message = "An unexpected error occurred.";

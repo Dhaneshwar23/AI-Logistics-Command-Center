@@ -8,6 +8,8 @@ using Castle.Core.Configuration;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using AILogistics.Infrastructure.Authentication;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -29,17 +31,19 @@ namespace AILogistics.Tests
             _userRepositoryMock = new Mock<IUserRepository>();
             _passwordHasherMock = new Mock<IPasswordHasher<User>>();
             _jwtTokenGeneratorMock = new Mock<IJwtTokenGenerator>();
-            var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
+            var jwtOptions = Options.Create(new JwtOptions
             {
-                ["Jwt:RefreshTokenExpiryDays"] = "7"
-            })
-            .Build();
+                Key = "unit-test-signing-key-at-least-32-characters",
+                Issuer = "unit-tests",
+                Audience = "unit-tests",
+                AccessTokenExpiryMinutes = 15,
+                RefreshTokenExpiryDays = 7
+            });
             _authService = new AuthService(
                 _userRepositoryMock.Object,
                 _passwordHasherMock.Object,
                 _jwtTokenGeneratorMock.Object,
-                configuration);
+                jwtOptions);
         }
 
         [Fact]

@@ -1,22 +1,13 @@
-﻿using AILogistics.Application.Customers;
-using AILogistics.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AILogistics.Application.Common;
+using AILogistics.Application.Customers;
 
-namespace AILogistics.Application.Interface
+namespace AILogistics.Application.Interface;
+
+public interface ICustomerService
 {
-    public interface ICustomerService
-    {
-        public Task<CustomerResponse> CreateCustomer(CreateCustomerRequest request);
-
-        public Task<List<CustomerResponse>> GetCustomers();
-        public Task<CustomerResponse?> GetCustomerById(int customerId);
-
-        public Task<CustomerResponse> UpdateCustomer(CreateCustomerRequest request, int id);
-
-        public Task<bool> DeleteCustomer(int customerId);
-    }
+    Task<CustomerResponse> CreateCustomer(CreateCustomerRequest request);
+    Task<PagedResponse<CustomerResponse>> GetCustomers(PaginationRequest pagination, CancellationToken cancellationToken = default);
+    Task<CustomerResponse?> GetCustomerById(int customerId);
+    Task<CustomerResponse> UpdateCustomer(UpdateCustomerRequest request, int id);
+    Task<bool> DeleteCustomer(int customerId);
 }

@@ -7,7 +7,8 @@ using AILogistics.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using AILogistics.Infrastructure.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,17 +22,17 @@ namespace AILogistics.Infrastructure.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
-        private readonly IConfiguration _configuration;
+        private readonly JwtOptions _jwtOptions;
 
         public AuthService(IUserRepository userRepository,
             IPasswordHasher<User> passwordHasher,
             IJwtTokenGenerator jwtTokenGenerator,
-            IConfiguration configuration)
+            IOptions<JwtOptions> jwtOptions)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _jwtTokenGenerator = jwtTokenGenerator;
-            _configuration = configuration;
+            _jwtOptions = jwtOptions.Value;
         }
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
         {
@@ -60,7 +61,7 @@ namespace AILogistics.Infrastructure.Services
 
                 string generatedRefreshToken = _jwtTokenGenerator.GenerateRefreshToken();
 
-                RefreshToken refreshToken = await CreateRefreshToken(user, generatedRefreshToken);
+                RefreshToken refreshToken = CreateRefreshToken(user, generatedRefreshToken);
 
                 await _userRepository.AddRefreshTokenAsync(refreshToken);
                 await _userRepository.SaveChangesAsync();
@@ -108,14 +109,12 @@ namespace AILogistics.Infrastructure.Services
             }
         }
 
-        public async Task<RefreshToken> CreateRefreshToken(User user, string generatedRefreshToken)
+        private RefreshToken CreateRefreshToken(User user, string generatedRefreshToken)
         {
-            int refreshTokenExpiryDays = int.Parse(_configuration["Jwt:RefreshTokenExpiryDays"]);
-
             RefreshToken rfToken = new RefreshToken
             {
                 Token = generatedRefreshToken,
-                ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpiryDays),
+                ExpiresAt = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays),
                 UserId = user.Id,
                 RevokedAt = null,
                 ReplacedByToken = null,
@@ -152,7 +151,7 @@ namespace AILogistics.Infrastructure.Services
 
                 JwtTokenResultDto jwtToken = _jwtTokenGenerator.GenerateToken(user);
 
-                RefreshToken newRefreshToken = await CreateRefreshToken(user, newGeneratedRefreshToken);
+                RefreshToken newRefreshToken = CreateRefreshToken(user, newGeneratedRefreshToken);
 
                 await _userRepository.AddRefreshTokenAsync(newRefreshToken);
                 await _userRepository.SaveChangesAsync();

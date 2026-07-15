@@ -1,199 +1,131 @@
-﻿using AILogistics.Application.Customers;
+using AILogistics.Application.Common;
+using AILogistics.Application.Customers;
 using AILogistics.Application.Exceptions;
 using AILogistics.Application.Interface;
 using AILogistics.Domain.Entities;
 using AILogistics.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AILogistics.Infrastructure.Services
+namespace AILogistics.Infrastructure.Services;
+
+public class CustomerService : ICustomerService
 {
-    public class CustomerService : ICustomerService
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger<CustomerService> _logger;
+
+    public CustomerService(ApplicationDbContext context, ILogger<CustomerService> logger)
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<CustomerService> _logger;
-        public CustomerService(ApplicationDbContext context, ILogger<CustomerService> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
-
-        public async Task<CustomerResponse> CreateCustomer(CreateCustomerRequest request)
-        {
-            Customer customer = new Customer();
-            customer.CompanyName = request.CompanyName;
-            customer.ContactPerson = request.ContactPerson;
-            customer.Email = request.Email;
-            customer.PhoneNumber = request.PhoneNumber;
-            customer.Address = request.Address;
-            customer.City = request.City;
-            customer.IsActive = true;
-            customer.CreatedAt = DateTime.UtcNow;
-            customer.UpdatedAt = DateTime.UtcNow;
-            customer.State = request.State;
-            customer.Country = request.Country;
-            customer.PostalCode = request.PostalCode;
-
-            await _context.Customers.AddAsync(customer);
-
-            await _context.SaveChangesAsync();
-
-            CustomerResponse response = new CustomerResponse();
-            response.Id = customer.Id;
-            response.CompanyName = customer.CompanyName;
-            response.ContactPerson = customer.ContactPerson;
-            response.Email = customer.Email;
-            response.PhoneNumber = customer.PhoneNumber;
-            response.Address = customer.Address;
-            response.City = customer.City;
-            response.State = customer.State;
-            response.Country = customer.Country;
-            response.PostalCode = customer.PostalCode;
-            response.IsActive = customer.IsActive;
-            response.CreatedAt = customer.CreatedAt;
-            response.UpdatedAt = customer.UpdatedAt;
-
-            return response;
-        }
-
-        public async Task<CustomerResponse?> GetCustomerById(int customerId)
-        {
-            Customer? customer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == customerId);
-
-            if (customer != null)
-            {
-                CustomerResponse response = new CustomerResponse
-                {
-                    Id = customer.Id,
-                    CompanyName = customer.CompanyName,
-                    ContactPerson = customer.ContactPerson,
-                    Email = customer.Email,
-                    PhoneNumber = customer.PhoneNumber,
-                    Address = customer.Address,
-                    City = customer.City,
-                    State = customer.State,
-                    Country = customer.Country,
-                    PostalCode = customer.PostalCode,
-                    IsActive = customer.IsActive,
-                    CreatedAt = customer.CreatedAt,
-                    UpdatedAt = customer.UpdatedAt,
-
-                };
-                return response;
-            }
-            else
-            {
-                throw new NotFoundException("No customer found");
-            }
-
-        }
-
-        public async Task<List<CustomerResponse>> GetCustomers()
-        {
-            _logger.LogInformation(
-                "Fetching customers from database at {Time}",
-                DateTime.UtcNow);
-
-            List<Customer> customers = await _context.Customers.ToListAsync();
-
-            List<CustomerResponse> customerList = new List<CustomerResponse>();
-
-            foreach (var cs in customers)
-            {
-                CustomerResponse customer = new CustomerResponse
-                {
-                    Id = cs.Id,
-                    CompanyName = cs.CompanyName,
-                    ContactPerson = cs.ContactPerson,
-                    Email = cs.Email,
-                    PhoneNumber = cs.PhoneNumber,
-                    Address = cs.Address,
-                    City = cs.City,
-                    State = cs.State,
-                    Country = cs.Country,
-                    PostalCode = cs.PostalCode,
-                    IsActive = cs.IsActive,
-                    CreatedAt = cs.CreatedAt,
-                    UpdatedAt = cs.UpdatedAt,
-                };
-                customerList.Add(customer);
-            }
-
-            return customerList;
-
-        }
-
-        public async Task<CustomerResponse?> UpdateCustomer(CreateCustomerRequest request, int id)
-        {
-            Customer? customer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (customer != null)
-            {
-                customer.CompanyName = request.CompanyName;
-                customer.ContactPerson = request.ContactPerson;
-                customer.Email = request.Email;
-                customer.PhoneNumber = request.PhoneNumber;
-                customer.Address = request.Address;
-                customer.City = request.City;
-                customer.State = request.State;
-                customer.Country = request.Country;
-                customer.PostalCode = request.PostalCode;
-                customer.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                CustomerResponse customerResponse = new CustomerResponse
-                {
-                    Id = customer.Id,
-                    CompanyName = customer.CompanyName,
-                    ContactPerson = customer.ContactPerson,
-                    Email = customer.Email,
-                    PhoneNumber = customer.PhoneNumber,
-                    Address = customer.Address,
-                    City = customer.City,
-                    State = customer.State,
-                    Country = customer.Country,
-                    PostalCode = customer.PostalCode,
-                    UpdatedAt = customer.UpdatedAt,
-                    CreatedAt = customer.CreatedAt,
-                    IsActive = customer.IsActive,
-
-                };
-
-                return customerResponse;
-
-            }
-
-            else
-            {
-                return null;
-            }
-
-        }
-
-
-        public async Task<bool> DeleteCustomer(int customerId)
-        {
-            Customer? deleteCustomer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == customerId);
-            if (deleteCustomer != null)
-            {
-                //_context.Customers.Remove(deleteCustomer);
-                deleteCustomer.IsActive = false;
-                deleteCustomer.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        _context = context;
+        _logger = logger;
     }
+
+    public async Task<CustomerResponse> CreateCustomer(CreateCustomerRequest request)
+    {
+        var customer = new Customer
+        {
+            CompanyName = request.CompanyName,
+            ContactPerson = request.ContactPerson,
+            Email = request.Email?.Trim().ToLowerInvariant(),
+            PhoneNumber = request.PhoneNumber,
+            Address = request.Address,
+            City = request.City,
+            State = request.State,
+            Country = request.Country,
+            PostalCode = request.PostalCode,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _context.Customers.Add(customer);
+        await _context.SaveChangesAsync();
+        return Map(customer);
+    }
+
+    public async Task<CustomerResponse?> GetCustomerById(int customerId)
+    {
+        return await _context.Customers
+            .AsNoTracking()
+            .Where(customer => customer.Id == customerId && customer.IsActive)
+            .Select(customer => Map(customer))
+            .SingleOrDefaultAsync()
+            ?? throw new NotFoundException("No customer found");
+    }
+
+    public async Task<PagedResponse<CustomerResponse>> GetCustomers(
+        PaginationRequest pagination,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Fetching customer page {PageNumber}", pagination.PageNumber);
+
+        var query = _context.Customers.AsNoTracking().Where(customer => customer.IsActive);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .OrderBy(customer => customer.Id)
+            .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .Select(customer => Map(customer))
+            .ToListAsync(cancellationToken);
+
+        return new PagedResponse<CustomerResponse>(items, pagination.PageNumber, pagination.PageSize, totalCount);
+    }
+
+    public async Task<CustomerResponse> UpdateCustomer(UpdateCustomerRequest request, int id)
+    {
+        var customer = await _context.Customers.SingleOrDefaultAsync(x => x.Id == id && x.IsActive)
+            ?? throw new NotFoundException("No customer found");
+
+        _context.Entry(customer).Property(x => x.RowVersion).OriginalValue = request.RowVersion;
+        customer.CompanyName = request.CompanyName;
+        customer.ContactPerson = request.ContactPerson;
+        customer.Email = request.Email?.Trim().ToLowerInvariant();
+        customer.PhoneNumber = request.PhoneNumber;
+        customer.Address = request.Address;
+        customer.City = request.City;
+        customer.State = request.State;
+        customer.Country = request.Country;
+        customer.PostalCode = request.PostalCode;
+        customer.UpdatedAt = DateTime.UtcNow;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new ConcurrencyException("The customer was modified by another request. Reload it and retry.", exception);
+        }
+
+        return Map(customer);
+    }
+
+    public async Task<bool> DeleteCustomer(int customerId)
+    {
+        var customer = await _context.Customers.SingleOrDefaultAsync(x => x.Id == customerId && x.IsActive);
+        if (customer is null) return false;
+
+        customer.IsActive = false;
+        customer.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    private static CustomerResponse Map(Customer customer) => new()
+    {
+        Id = customer.Id,
+        CompanyName = customer.CompanyName,
+        ContactPerson = customer.ContactPerson,
+        Email = customer.Email,
+        PhoneNumber = customer.PhoneNumber,
+        Address = customer.Address,
+        City = customer.City,
+        State = customer.State,
+        Country = customer.Country,
+        PostalCode = customer.PostalCode,
+        IsActive = customer.IsActive,
+        CreatedAt = customer.CreatedAt,
+        UpdatedAt = customer.UpdatedAt,
+        RowVersion = customer.RowVersion
+    };
 }
