@@ -2,22 +2,34 @@ import {  useState } from 'react'
 import { Box, Button, Paper, TextField, Typography  } from '@mui/material'
 import authService from '@/services/authService';
 import tokenStorage from '@/services/tokenStorage';
+import useAuth from '@/context/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 function LoginPage() 
 {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate = useNavigate();
+    const { login } = useAuth();
+        
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const res = await authService.login({email, password})
         tokenStorage.setAccessToken(res.token)
-    //     console.log({userId: res.userId,
-    //         role: res.role,
-    //         expiresAt: res.expiresAt,
-    //         fullName: res.fullName,
-    //         email: res.email,
-    // })
+
+        login({
+            userId: res.userId,
+            email: res.email,
+            role: res.role,
+            fullName: res.fullName
+        })
+
+        navigate('/customers', { replace: true })
+
+
+        // const customersResponse = await api.get('/api/v1/customers')
+
+        // console.log(customersResponse.data)
     }
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: { xs: 2, sm: 3} }}>
