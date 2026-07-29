@@ -1,5 +1,6 @@
 {
   "name": "client",
+  "homepage": "https://Dhaneshwar23.github.io/AI-Logistics-Command-Center/Client/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,6 +16,7 @@
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
     "axios": "^1.18.1",
+    "gh-pages": "^6.3.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1"
