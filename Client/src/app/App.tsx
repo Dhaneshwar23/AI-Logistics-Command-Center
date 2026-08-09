@@ -3,9 +3,10 @@ import './App.css'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from '@/routes/ProtectedRoute'
 import MainLayout from '@/components/layouts/MainLayout';
+import CustomersPage from '@/features/customers/CustomersPage';
 
 function App() {
- const CustomersPage = () => <h1>Customers Page</h1>;
+ //const CustomersPage = () => <h1>Customers Page</h1>;
 
 const ShipmentsPage = () => <h1>Shipments Page</h1>;
 

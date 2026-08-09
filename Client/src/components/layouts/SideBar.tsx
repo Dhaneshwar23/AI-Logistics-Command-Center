@@ -36,7 +36,7 @@ const SideBar = ({drawerWidth}: SideBarProps) => {
         <Drawer variant="permanent" sx={{ width: drawerWidth, flexShrink: 0, "& .MuiDrawer-paper":{width: drawerWidth, boxSizing: 'border-box'} }}>
             <List>
                 {menuItems.map((item) => (
-                    <ListItemButton /*key={item.path}*/ component={NavLink} to={item.path} sx={{ '&.active': { backgroundColor: "action.selected" } }}>
+                    <ListItemButton key={item.path} component={NavLink} to={item.path} sx={{ '&.active': { backgroundColor: "action.selected" } }}>
                         <ListItemIcon>
                             {item.icon}
                         </ListItemIcon>
