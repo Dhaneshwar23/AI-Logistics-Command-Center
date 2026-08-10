@@ -483,3 +483,5 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 src/AILogistics.Api/appsettings.Development.json
+Client/.env.development
+Client/.env.production

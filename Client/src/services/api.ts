@@ -9,7 +9,7 @@ interface RetryRequestConfig extends InternalAxiosRequestConfig {
 
 const api = axios.create({
     //baseURL: 'https://localhost:7009',
-    baseURL: 'https://ai-logistics-api-dk-dqbxfmezfaafc2gn.southeastasia-01.azurewebsites.net',
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },

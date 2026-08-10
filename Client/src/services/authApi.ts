@@ -1,7 +1,9 @@
 import axios from "axios";
 
+console.log("baseURL " + import.meta.env.VITE_API_BASE_URL);
 const authApi = axios.create({
-    baseURL: "https://ai-logistics-api-dk-dqbxfmezfaafc2gn.southeastasia-01.azurewebsites.net",
+    
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
