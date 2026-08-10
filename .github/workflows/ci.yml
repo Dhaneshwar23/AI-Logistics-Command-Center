@@ -6,23 +6,23 @@ on:
       - master
       - feature/github-actions-cicd
     paths:
-      - 'Api/**'
+      - 'src/**'
+      - 'tests/**'
+      - '*.sln'
       - '.github/workflows/ci.yml'
 
   pull_request:
     branches:
       - master
     paths:
-      - 'Api/**'
+      - 'src/**'
+      - 'tests/**'
+      - '*.sln'
       - '.github/workflows/ci.yml'
-
+      
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./Api
 
     steps:
       - name: Checkout code
