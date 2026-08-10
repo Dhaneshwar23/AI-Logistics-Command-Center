@@ -10,7 +10,6 @@ import {
     Alert
 } from "@mui/material";
 import { useState } from "react";
-import axios from "axios";
 import getApiErrorMessage from "@/utils/getApiErrorMessage";
 
 interface DeleteCustomersDialogProps {

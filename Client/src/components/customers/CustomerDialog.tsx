@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from 'react';
 import CustomerForm from './CustomerForm';
 import { emptyCustomer } from '@/types/customer';
-import axios from 'axios';
 import getApiErrorMessage from '@/utils/getApiErrorMessage';
 
 
