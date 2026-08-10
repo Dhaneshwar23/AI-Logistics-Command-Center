@@ -46,6 +46,9 @@ function LoginPage() {
 
         // console.log(customersResponse.data)
     }
+    if (error) {
+        return <p>{error}</p>;
+    }
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: { xs: 2, sm: 3 } }}>
             <Paper elevation={4} sx={{ width: '100%', maxWidth: 420, p: { xs: 3, sm: 4 }, }}>

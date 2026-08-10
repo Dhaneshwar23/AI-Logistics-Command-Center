@@ -4,25 +4,13 @@ import type { PagedResult } from '@/types/pagination';
 import customerService from '@/services/customerService';
 import CustomerDialog from '@/components/customers/CustomerDialog';
 import DeleteCustomersDialog from '@/components/customers/DeleteCustomersDialog';
-import axios from 'axios';
 import {
     Stack,
     Alert,
     Box,
     CircularProgress,
     Button,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TextField,
-    Typography,
-    IconButton,
-    Tooltip,
+    Typography
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CustomerTable from '@/components/customers/CustomerTable';
@@ -77,19 +65,9 @@ function CustomersPage() {
         setPageNumber(1);
     }
 
-    const handleOpenDialog = () => {
-        console.log("Open dialog");
-        setIsDialogOpen(true);
-    }
-
     const handleCloseDialog = () => {
         console.log("Close dialog");
         setIsDialogOpen(false);
-    }
-
-    const handleEditCustomer = (customer: Customer) => {
-        setSelectedCustomer(customer);
-        setIsDialogOpen(true);
     }
 
     const handleDeleteCustomer = (customer: Customer) => {

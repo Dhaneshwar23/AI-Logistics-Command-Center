@@ -1,6 +1,5 @@
 import type { CustomerBaseModel, CustomerValidationErrors } from '@/types/customer';
 import {
-    Stack,
     Grid,
     TextField,
 } from '@mui/material';
