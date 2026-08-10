@@ -6,7 +6,9 @@ import {
     DialogContent,
     DialogActions,
     Button,
-    Alert
+    Alert,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import CustomerForm from './CustomerForm';
@@ -31,6 +33,8 @@ const CustomerDialog = ({
 }: CustomerDialogProps) => {
     const [customer, setCustomer] = useState<CustomerBaseModel>(emptyCustomer);
     const [validationErrors, setValidationErrors] = useState<CustomerValidationErrors>({});
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const validateCustomer = () => {
         const errors: CustomerValidationErrors = {}
@@ -119,7 +123,7 @@ const CustomerDialog = ({
         }
         catch (error: unknown) {
             setError(
-                getApiErrorMessage({error, defaultMessage: 'Unable to create customer.'})
+                getApiErrorMessage({ error, defaultMessage: 'Unable to create customer.' })
             );
         }
         finally {
@@ -157,9 +161,13 @@ const CustomerDialog = ({
 
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog open={open}
+                onClose={onClose}
+                fullWidth
+                maxWidth="md"
+                fullScreen={isMobile}>
             <DialogTitle>{mode === 'edit' ? 'Edit Customer' : 'Add Customer'}</DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ pt: 2.5 }}>
                 {error && (
                     <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
                 )}

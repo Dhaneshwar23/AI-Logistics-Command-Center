@@ -105,14 +105,14 @@ function CustomersPage() {
         <Box>
             <Stack
                 component="div"
-                direction="row"
-                sx={{ mb: 3, justifyContent: 'space-between', alignItems: 'center' }}
+                direction={{ xs: "column", sm: "row" }}
+                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "center" } }}
             >
                 <Typography variant="h4">
                     Customers
                 </Typography>
 
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddCustomer}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddCustomer} sx={{ width: { xs: "100%", sm: "auto" } }}>
                     Add Customer
                 </Button>
             </Stack>

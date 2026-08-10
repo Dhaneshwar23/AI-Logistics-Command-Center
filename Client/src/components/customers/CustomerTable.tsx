@@ -46,10 +46,10 @@ const CustomerTable = ({
                             <TableCell>Email</TableCell>
                             <TableCell>Phone</TableCell>
                             <TableCell>City</TableCell>
-                            <TableCell>State</TableCell>
-                            <TableCell>Country</TableCell>
-                            <TableCell sx={{ minWidth: 110 }}>Postal Code</TableCell>
-                            <TableCell sx={{ minWidth: 220 }}>Address</TableCell>
+                            <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>State</TableCell>
+                            <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>Country</TableCell>
+                            <TableCell sx={{ display: { xs: "none", md: "table-cell" },minWidth: 110 }}>Postal Code</TableCell>
+                            <TableCell sx={{ display: { xs: "none", md: "table-cell"}, minWidth: 220 }}>Address</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
@@ -64,10 +64,10 @@ const CustomerTable = ({
                                     <TableCell>{customer.email}</TableCell>
                                     <TableCell>{customer.phoneNumber}</TableCell>
                                     <TableCell>{customer.city}</TableCell>
-                                    <TableCell>{customer.state}</TableCell>
-                                    <TableCell>{customer.country}</TableCell>
-                                    <TableCell>{customer.postalCode}</TableCell>
-                                    <TableCell>{customer.address}</TableCell>
+                                    <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>{customer.state}</TableCell>
+                                    <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>{customer.country}</TableCell>
+                                    <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>{customer.postalCode}</TableCell>
+                                    <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>{customer.address}</TableCell>
                                     <TableCell>{customer.isActive ? "Active" : "Inactive"}</TableCell>
                                     <TableCell align="right">
                                         <Tooltip title="Edit Customer">

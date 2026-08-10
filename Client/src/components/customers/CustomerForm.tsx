@@ -19,7 +19,7 @@ const CustomerForm = ({
     onChange,
 }: CustomerFormProps) => {
     return (
-        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                     label="Company Name"
