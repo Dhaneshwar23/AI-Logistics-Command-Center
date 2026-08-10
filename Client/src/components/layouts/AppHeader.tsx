@@ -1,9 +1,17 @@
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
 import useAuth from '@/context/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 
 const AppHeader = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login', { replace: true });
+    }
+
     return (
         <AppBar position="static">
             <Toolbar>
@@ -11,11 +19,15 @@ const AppHeader = () => {
                     AI Logistics
                 </Typography>
 
-                <Box sx={{flexGrow: 1}} />
+                <Box sx={{ flexGrow: 1 }} />
 
                 <Typography>
-                    {user?.fullName || 'Dhaneshwar'}
+                    {user?.fullName}
                 </Typography>
+
+                <Button color="inherit" onClick={handleLogout}>
+                    Logout
+                </Button>
             </Toolbar>
         </AppBar>
     );

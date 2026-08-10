@@ -114,9 +114,9 @@ function CustomersPage() {
         customerResponse();
     }, [pageNumber, pageSize]);
 
-    if (loading) {
-        return <p>Loading customers...</p>;
-    }
+    // if (loading) {
+    //     return <p>Loading customers...</p>;
+    // }
 
     if (error) {
         return <p>{error}</p>;
@@ -130,7 +130,7 @@ function CustomersPage() {
                 direction="row"
                 sx={{ mb: 3, justifyContent: 'space-between', alignItems: 'center' }}
             >
-                <Typography variant="h4" sx={{ mb: 3 }}>
+                <Typography variant="h4">
                     Customers
                 </Typography>
 
