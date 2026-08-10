@@ -12,7 +12,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: ai-logistics-api-dk
   DOTNET_VERSION: '8.0.x'
-  API_PROJECT_PATH: ./src/AILogistics.Api/AILogistics.Api.csproj
+  API_PROJECT_PATH: ./Api/src/AILogistics.Api/AILogistics.Api.csproj
 
 jobs:
   deploy:
@@ -29,6 +29,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
+        working-directory: ./Api
         run: dotnet restore
 
       - name: Publish API
