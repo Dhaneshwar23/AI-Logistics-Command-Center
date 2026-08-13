@@ -106,9 +106,9 @@ function CustomersPage() {
             <Stack
                 component="div"
                 direction={{ xs: "column", sm: "row" }}
-                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "center" } }}
+                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "center", justifyContent: "space-between" } }}
             >
-                <Typography variant="h4">
+                <Typography variant="h4" sx={{ mb: { xs: 2, sm: 0 } }}>
                     Customers
                 </Typography>
 

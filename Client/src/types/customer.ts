@@ -10,11 +10,6 @@ export interface UpdateCustomerRequest extends CustomerBaseModel {
     rowVersion: string;
 }
 
-export interface GetCustomersRequest {
-    pageNumber: number;
-    pageSize: number;
-}
-
 export interface CustomerBaseModel {
     companyName: string;
     contactPerson: string;

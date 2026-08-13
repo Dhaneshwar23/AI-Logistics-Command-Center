@@ -2,14 +2,13 @@ import api from "@/services/api";
 import type {
     Customer,
     CreateCustomerRequest,
-    UpdateCustomerRequest,
-    GetCustomersRequest
+    UpdateCustomerRequest
 } from "@/types/customer";
-import type { PagedResult } from "@/types/pagination"
+import type { PagedResult, PaginationRequest } from "@/types/pagination"
 
 const customerService = {
     getAllCustomers: async (
-        request: GetCustomersRequest)
+        request: PaginationRequest)
         : Promise<PagedResult<Customer>> => {
         const res = await api.get<PagedResult<Customer>>(
             "/api/v1/customers",
