@@ -7,13 +7,12 @@ import CustomersPage from '@/features/customers/CustomersPage';
 import ShipmentsPage from '@/features/shipments/ShipmentsPage';
 import useAuth from '@/context/useAuth';
 import TrackingPage from '@/features/tracking/TrackingPage';
+import DashboardPage from '@/features/dashboard/DashboardPage';
 
 function App() {
   //const CustomersPage = () => <h1>Customers Page</h1>;
 
   //const ShipmentsPage = () => <h1>Shipments Page</h1>;
-
-  const DashboardPage = () => <h1>Dashboard Page</h1>;
 
   const RootRedirect = () => {
     const { isAuthenticated } = useAuth();
