@@ -162,7 +162,7 @@ const CustomerDialog = ({
 
     return (
         <Dialog open={open}
-                onClose={onClose}
+                onClose={isSubmitting ? undefined : onClose}
                 fullWidth
                 maxWidth="md"
                 fullScreen={isMobile}>
@@ -175,7 +175,7 @@ const CustomerDialog = ({
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     onClick={handleCancel}
                     disabled={isSubmitting}
                 >

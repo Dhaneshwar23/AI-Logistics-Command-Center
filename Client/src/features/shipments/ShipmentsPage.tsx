@@ -173,11 +173,12 @@ function ShipmentsPage() {
         <Box>
             <Stack component="div"
                 direction={{ xs: "column", sm: "row" }}
-                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "center" } }}>
+                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "flex-end" } }}>
 
-                <Typography variant="h4" sx={{ mb: { xs: 2, sm: 0 } }}>
-                    Shipments
-                </Typography>
+                <Box sx={{ mb: { xs: 2, sm: 0 } }}>
+                    <Typography variant="h4">Shipments</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Create and manage active logistics orders.</Typography>
+                </Box>
 
                 <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddShipment} sx={{ width: { xs: "100%", sm: "auto" } }}>
                     Add Shipment
@@ -190,7 +191,7 @@ function ShipmentsPage() {
             }
 
             {!loading && !error && shipments.length === 0 && (
-                <Alert severity="info">No shipments found.</Alert>
+                <Alert severity="info" variant="outlined">No shipments found.</Alert>
             )}
 
             {

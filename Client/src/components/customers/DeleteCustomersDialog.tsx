@@ -34,6 +34,8 @@ const DeleteCustomersDialog = ({
             return;
         }
         try {
+            setIsDeleting(true);
+            setError(null);
             await customerService.deleteCustomer(customer.id);
             onSuccess();
             onClose();
@@ -50,7 +52,7 @@ const DeleteCustomersDialog = ({
     }
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={isDeleting ? undefined : onClose} fullWidth maxWidth="xs">
             <DialogTitle>Delete Customer</DialogTitle>
             <DialogContent>
                 {error && (
@@ -64,7 +66,7 @@ const DeleteCustomersDialog = ({
                 </Typography>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} disabled={isDeleting}>Cancel</Button>
+                <Button variant="outlined" onClick={onClose} disabled={isDeleting}>Cancel</Button>
                 <Button color="error" variant="contained" onClick={handleDelete} disabled={isDeleting}>
                     {isDeleting ? "Deleting..." : "Delete"}
                 </Button>

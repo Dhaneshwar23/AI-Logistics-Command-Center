@@ -34,7 +34,10 @@ const DashboardPage = () => {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ mb: 3 }}>Dashboard</Typography>
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="h4">Dashboard</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Current logistics operations at a glance.</Typography>
+            </Box>
 
             {loading && <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress /></Box>}
             {!loading && error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -56,7 +59,7 @@ const DashboardPage = () => {
                         </Grid>
                     </Grid>
 
-                    <Paper variant="outlined" sx={{ mt: 2.5, p: 2.5 }}>
+                    <Paper variant="outlined" sx={{ mt: 2.5, p: { xs: 2.25, sm: 2.5 }, boxShadow: '0 1px 2px rgba(15, 23, 42, 0.03)' }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>Shipment Status</Typography>
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} divider={<Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />}>
                             <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flex: 1 }}>
