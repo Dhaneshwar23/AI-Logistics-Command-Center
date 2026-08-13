@@ -1,4 +1,5 @@
 using AILogistics.Application.Common;
+using AILogistics.Application.DTOs.Dashboard;
 using AILogistics.Application.DTOs.Shipments;
 using AILogistics.Application.Exceptions;
 using AILogistics.Application.Interfaces;
@@ -125,6 +126,37 @@ public class ShipmentService : IShipmentService
         }
 
         return Map(shipment, shipment.Customer.CompanyName);
+    }
+
+    public async Task<DashboardSummaryResponseDto> GetDashboardSummaryAsync()
+    {
+        var totalShipments = await _context.Shipment.CountAsync();
+
+        var pendingShipments = await _context.Shipment
+            .CountAsync(x => x.Status == ShipmentStatus.Pending);
+
+        var inTransitShipments = await _context.Shipment
+            .CountAsync(x => x.Status == ShipmentStatus.InTransit);
+
+        var deliveredShipments = await _context.Shipment
+            .CountAsync(x => x.Status == ShipmentStatus.Delivered);
+
+        var cancelledShipments = await _context.Shipment
+            .CountAsync(x => x.Status == ShipmentStatus.Cancelled);
+
+        var failedPayments = await _context.Shipment
+            .CountAsync(x => x.PaymentStatus == PaymentStatus.Failed);
+
+        return new DashboardSummaryResponseDto
+        {
+            TotalShipments = totalShipments,
+            PendingShipments = pendingShipments,
+            InTransitShipments = inTransitShipments,
+            DeliveredShipments = deliveredShipments,
+            CancelledShipments = cancelledShipments,
+            FailedPayments = failedPayments
+        };
+
     }
 
     private static ShipmentResponse Map(Shipment shipment, string customerName) => new()
