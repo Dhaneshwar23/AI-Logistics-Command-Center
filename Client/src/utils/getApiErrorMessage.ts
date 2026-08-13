@@ -12,7 +12,6 @@ const getApiErrorMessage = ({
     if (axios.isAxiosError(error)) {
         return (
             error.response?.data?.message ??
-            error.message ??
             defaultMessage
         );
     }
