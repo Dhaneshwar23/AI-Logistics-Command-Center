@@ -45,6 +45,7 @@ const ShipmentDialog = ({ open,
             </DialogContent>
             <DialogActions>
                 <Button
+                    variant="outlined"
                     onClick={onClose}
                     disabled={loading}
                 >

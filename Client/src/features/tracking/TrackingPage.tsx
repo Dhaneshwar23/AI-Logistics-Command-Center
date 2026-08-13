@@ -7,7 +7,7 @@ import type { Shipment } from '@/types/shipment';
 import type { CreateTrackingEventRequest, TrackingEvent } from '@/types/trackingEvent';
 import getApiErrorMessage from '@/utils/getApiErrorMessage';
 import AddIcon from '@mui/icons-material/Add';
-import { Alert, Box, Button, CircularProgress, FormControl, InputLabel, MenuItem, Select, Stack, TablePagination, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TablePagination, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 
 const TrackingPage = () => {
@@ -78,14 +78,18 @@ const TrackingPage = () => {
 
     return (
         <Box>
-            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' } }}>
-                <Typography variant="h4" sx={{ mb: { xs: 2, sm: 0 } }}>Tracking</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'flex-end' } }}>
+                <Box sx={{ mb: { xs: 2, sm: 0 } }}>
+                    <Typography variant="h4">Tracking</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Review shipment movement and delivery history.</Typography>
+                </Box>
                 <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setCreateError(null); setDialogOpen(true); }} sx={{ width: { xs: '100%', sm: 'auto' } }}>
                     Add Tracking Event
                 </Button>
             </Stack>
 
-            <FormControl fullWidth sx={{ mb: 3, maxWidth: { sm: 480 } }}>
+            <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 3 }}>
+            <FormControl fullWidth sx={{ maxWidth: { sm: 520 } }}>
                 <InputLabel id="shipment-filter-label">Shipment</InputLabel>
                 <Select labelId="shipment-filter-label" label="Shipment" value={selectedShipmentId}
                     onChange={(event) => { setSelectedShipmentId(String(event.target.value) === '' ? '' : Number(event.target.value)); setPageNumber(1); }}>
@@ -93,18 +97,19 @@ const TrackingPage = () => {
                     {shipments.map((shipment) => <MenuItem key={shipment.id} value={shipment.id}>{shipment.shipmentNumber}</MenuItem>)}
                 </Select>
             </FormControl>
+            </Paper>
 
             {loading && <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress /></Box>}
             {!loading && error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             {!loading && !error && events.length === 0 && (
-                <Alert severity="info">{selectedShipmentId === '' ? 'No tracking events found.' : 'No tracking history exists for this shipment yet.'}</Alert>
+                <Alert severity="info" variant="outlined">{selectedShipmentId === '' ? 'No tracking events found.' : 'No tracking history exists for this shipment yet.'}</Alert>
             )}
             {!loading && !error && events.length > 0 && (
                 <>
                     <TrackingTimeline events={events} showShipmentNumber={selectedShipmentId === ''} />
-                    {selectedShipmentId === '' && <TablePagination component="div" count={pagedEvents?.totalCount ?? 0} page={pageNumber - 1} rowsPerPage={pageSize}
+                    {selectedShipmentId === '' && <Paper variant="outlined" sx={{ mt: 0.5, overflow: 'hidden' }}><TablePagination component="div" count={pagedEvents?.totalCount ?? 0} page={pageNumber - 1} rowsPerPage={pageSize}
                         onPageChange={(_event, newPage) => setPageNumber(newPage + 1)}
-                        onRowsPerPageChange={(event) => { setPageSize(Number(event.target.value)); setPageNumber(1); }} rowsPerPageOptions={[5, 10, 25]} />}
+                        onRowsPerPageChange={(event) => { setPageSize(Number(event.target.value)); setPageNumber(1); }} rowsPerPageOptions={[5, 10, 25]} /></Paper>}
                 </>
             )}
 

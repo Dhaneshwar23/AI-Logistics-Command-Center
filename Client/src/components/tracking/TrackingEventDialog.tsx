@@ -25,7 +25,7 @@ const TrackingEventDialog = ({ open, shipments, initialShipmentId, loading, erro
                 {open && <TrackingEventForm shipments={shipments} initialShipmentId={initialShipmentId} loading={loading} onSubmit={onSubmit} />}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} disabled={loading}>Cancel</Button>
+                <Button variant="outlined" onClick={onClose} disabled={loading}>Cancel</Button>
                 <Button type="submit" form="tracking-event-form" variant="contained" disabled={loading}>
                     {loading ? 'Adding...' : 'Add Event'}
                 </Button>

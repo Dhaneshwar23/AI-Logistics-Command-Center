@@ -11,7 +11,7 @@ interface DeleteShipmentDialogProps {
 }
 
 const DeleteShipmentDialog = ({ open, shipment, loading, error, onClose, onConfirm }: DeleteShipmentDialogProps) => (
-    <Dialog open={open} onClose={loading ? undefined : onClose}>
+    <Dialog open={open} onClose={loading ? undefined : onClose} fullWidth maxWidth="xs">
         <DialogTitle>Delete Shipment</DialogTitle>
         <DialogContent>
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -20,7 +20,7 @@ const DeleteShipmentDialog = ({ open, shipment, loading, error, onClose, onConfi
             </Typography>
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose} disabled={loading}>Cancel</Button>
+            <Button variant="outlined" onClick={onClose} disabled={loading}>Cancel</Button>
             <Button color="error" variant="contained" onClick={onConfirm} disabled={loading || !shipment}>
                 {loading ? 'Deleting...' : 'Delete'}
             </Button>

@@ -102,11 +102,12 @@ function CustomersPage() {
             <Stack
                 component="div"
                 direction={{ xs: "column", sm: "row" }}
-                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "center", justifyContent: "space-between" } }}
+                sx={{ mb: 3, justifyContent: 'space-between', alignItems: { xs: "stretch", sm: "flex-end" } }}
             >
-                <Typography variant="h4" sx={{ mb: { xs: 2, sm: 0 } }}>
-                    Customers
-                </Typography>
+                <Box sx={{ mb: { xs: 2, sm: 0 } }}>
+                    <Typography variant="h4">Customers</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Manage customer accounts and contact information.</Typography>
+                </Box>
 
                 <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddCustomer} sx={{ width: { xs: "100%", sm: "auto" } }}>
                     Add Customer
@@ -125,7 +126,7 @@ function CustomersPage() {
 
             {
                 !loading && !error && customers.length === 0 && (
-                    <Alert severity="info">
+                    <Alert severity="info" variant="outlined">
                         No customers found.
                     </Alert>
                 )

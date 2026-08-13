@@ -46,9 +46,9 @@ const ShipmentTable = ({
 }: ShipmentTableProps) => {
 
     return (
-        <Paper>
-            <TableContainer>
-                <Table>
+        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+            <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
+                <Table size="small" sx={{ minWidth: 980 }}>
                     <TableHead>
                         <TableRow>
                             <TableCell>Shipment #</TableCell>
@@ -65,9 +65,9 @@ const ShipmentTable = ({
                     <TableBody>
                         {
                             shipments.map((shipment) =>
-                                <TableRow key={shipment.id}>
-                                    <TableCell>{shipment.shipmentNumber}</TableCell>
-                                    <TableCell>{shipment.customerName}</TableCell>
+                                <TableRow key={shipment.id} hover>
+                                    <TableCell sx={{ minWidth: 190, maxWidth: 240, fontWeight: 700, color: 'primary.dark', overflowWrap: 'anywhere' }}>{shipment.shipmentNumber}</TableCell>
+                                    <TableCell sx={{ minWidth: 160, maxWidth: 230, overflowWrap: 'anywhere' }}>{shipment.customerName}</TableCell>
                                     <TableCell>{shipment.origin}</TableCell>
                                     <TableCell>{shipment.destination}</TableCell>
                                     <TableCell>{shipment.weightKg}</TableCell>
@@ -75,20 +75,22 @@ const ShipmentTable = ({
                                         <Chip
                                             label={getShipmentStatusLabel(shipment.shipmentStatus)}
                                             color={getShipmentStatusColor(shipment.shipmentStatus)}
+                                            variant="outlined"
                                             size="small" />
                                     </TableCell>
                                     <TableCell>
                                         <Chip
                                             label={getPaymentStatusLabel(shipment.paymentStatus)}
                                             color={getPaymentStatusColor(shipment.paymentStatus)}
+                                            variant="outlined"
                                             size="small" />
                                     </TableCell>
                                     <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                                         <Tooltip title="Edit Shipment">
-                                            <IconButton size="small" onClick={() => onEdit(shipment)}><EditIcon /></IconButton>
+                                            <IconButton size="small" aria-label={`Edit ${shipment.shipmentNumber}`} onClick={() => onEdit(shipment)}><EditIcon /></IconButton>
                                         </Tooltip>
                                         <Tooltip title="Delete Shipment">
-                                            <IconButton size="small" onClick={() => onDelete(shipment)}><DeleteIcon /></IconButton>
+                                            <IconButton size="small" color="error" aria-label={`Delete ${shipment.shipmentNumber}`} onClick={() => onDelete(shipment)}><DeleteIcon /></IconButton>
                                         </Tooltip>
                                     </TableCell>
                                 </TableRow>

@@ -20,14 +20,16 @@ const MainLayout = () => {
     };
 
     return (
-        <Box>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
             <AppHeader onMenuClick={handleMobileDrawerToggle} />
 
             <Box sx={{ display: 'flex' }}>
                 <SideBar mobileOpen={mobileOpen} onClose={handleMobileDrawerClose} drawerWidth={DRAWER_WIDTH} />
 
-                <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, minWidth: 0, width: { md: `calc(100% -${DRAWER_WIDTH}px)` }, ml: { md: `${DRAWER_WIDTH}px` }, overflow: 'hidden' }}>
-                    <Outlet />
+                <Box component="main" sx={{ flexGrow: 1, minWidth: 0, width: { md: `calc(100% - ${DRAWER_WIDTH}px)` }, ml: { md: `${DRAWER_WIDTH}px` }, overflow: 'hidden' }}>
+                    <Box sx={{ width: '100%', maxWidth: 1440, mx: 'auto', p: { xs: 2, sm: 3, lg: 4 } }}>
+                        <Outlet />
+                    </Box>
                 </Box>
             </Box>
         </Box>
