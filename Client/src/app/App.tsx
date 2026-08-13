@@ -6,13 +6,12 @@ import MainLayout from '@/components/layouts/MainLayout';
 import CustomersPage from '@/features/customers/CustomersPage';
 import ShipmentsPage from '@/features/shipments/ShipmentsPage';
 import useAuth from '@/context/useAuth';
+import TrackingPage from '@/features/tracking/TrackingPage';
 
 function App() {
   //const CustomersPage = () => <h1>Customers Page</h1>;
 
   //const ShipmentsPage = () => <h1>Shipments Page</h1>;
-
-  const TrackingPage = () => <h1>Tracking Page</h1>;
 
   const DashboardPage = () => <h1>Dashboard Page</h1>;
 

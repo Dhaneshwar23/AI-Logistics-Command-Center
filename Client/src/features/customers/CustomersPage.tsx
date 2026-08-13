@@ -96,10 +96,6 @@ function CustomersPage() {
     //     return <p>Loading customers...</p>;
     // }
 
-    if (error) {
-        return <p>{error}</p>;
-    }
-
     return (
 
         <Box>
