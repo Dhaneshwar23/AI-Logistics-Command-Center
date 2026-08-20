@@ -159,6 +159,46 @@ public class ShipmentService : IShipmentService
 
     }
 
+    public async Task<PagedResponse<ShipmentResponse>> GetShipmentsByCustomerId(PaginationRequest pagination,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        if (customerId <= 0)
+        {
+            throw new InvalidOperationException("Customer Id is required.");
+        }
+
+        var query = _context.Shipment.Where(x => x.CustomerId == customerId);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var shipments = await query
+            .OrderBy(shipment => shipment.Id)
+            .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .Select(shipment => new ShipmentResponse
+            {
+                Id = shipment.Id,
+                ShipmentNumber = shipment.ShipmentNumber,
+                CustomerId = shipment.CustomerId,
+                CustomerName = shipment.Customer.CompanyName,
+                Origin = shipment.Origin,
+                Destination = shipment.Destination,
+                WeightKg = shipment.WeightKg,
+                ShipmentStatus = shipment.Status,
+                PaymentStatus = shipment.PaymentStatus,
+                PickupDate = shipment.PickupDate,
+                DeliveryDate = shipment.DeliveryDate,
+                CreatedAt = shipment.CreatedAt,
+                UpdatedAt = shipment.UpdatedAt,
+                RowVersion = shipment.RowVersion
+            })
+            .ToListAsync(cancellationToken);
+
+        return new PagedResponse<ShipmentResponse>(shipments, pagination.PageNumber, pagination.PageSize, totalCount);
+
+    }
+
     private static ShipmentResponse Map(Shipment shipment, string customerName) => new()
     {
         Id = shipment.Id,

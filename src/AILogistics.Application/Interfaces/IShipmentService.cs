@@ -10,6 +10,7 @@ public interface IShipmentService
     Task<PagedResponse<ShipmentResponse>> GetAllShipments(PaginationRequest pagination, CancellationToken cancellationToken = default);
     Task<ShipmentResponse> GetShipmentById(int id);
     Task<ShipmentResponse> GetShipmentByShipmentNumber(string shipmentNumber);
+    Task<PagedResponse<ShipmentResponse>> GetShipmentsByCustomerId(PaginationRequest pagination, int customerId, CancellationToken cancellationToken);
     Task<ShipmentResponse> UpdateShipment(int shipmentId, UpdateShipment request);
     Task<bool> DeleteShipment(int shipmentId);
     Task<DashboardSummaryResponseDto> GetDashboardSummaryAsync();

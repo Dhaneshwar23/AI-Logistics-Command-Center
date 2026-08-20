@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.ResponseCompression;
+﻿using AILogistics.Infrastructure.AI.Gemini;
+using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 
 namespace AILogistics.Api.Extensions
