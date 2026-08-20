@@ -3,6 +3,8 @@ using AILogistics.Api.Middleware;
 using AILogistics.Application.Interface;
 using AILogistics.Application.Interfaces;
 using AILogistics.Domain.Entities;
+using AILogistics.Infrastructure.AI.Gemini;
+using AILogistics.Infrastructure.AI.Groq;
 using AILogistics.Infrastructure.Authentication;
 using AILogistics.Infrastructure.Persistence;
 using AILogistics.Infrastructure.Seed;
@@ -47,6 +49,14 @@ builder.Services.AddHealthCheckConfiguration();
 
 builder.Services.AddCorsConfiguration(builder.Configuration);
 
+builder.Services.Configure<GeminiOptions>(
+    builder.Configuration.GetSection(GeminiOptions.SectionName));
+
+builder.Services.Configure<GroqOptions>(
+    builder.Configuration.GetSection(GroqOptions.SectionName));
+
+builder.Services.AddHttpClient<GroqAgent>();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.AddServerHeader = false;
@@ -55,6 +65,8 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddResponseCompressionConfiguration();
 
 builder.Services.AddOutputCacheConfiguration();
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

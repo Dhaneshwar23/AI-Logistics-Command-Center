@@ -14,22 +14,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AILogistics.Application.Interface;
+using AILogistics.Application.Customers;
 
 namespace AILogistics.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICustomerService _customerService;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly JwtOptions _jwtOptions;
 
         public AuthService(IUserRepository userRepository,
+            ICustomerService customerService,
             IPasswordHasher<User> passwordHasher,
             IJwtTokenGenerator jwtTokenGenerator,
             IOptions<JwtOptions> jwtOptions)
         {
             _userRepository = userRepository;
+            _customerService = customerService;
             _passwordHasher = passwordHasher;
             _jwtTokenGenerator = jwtTokenGenerator;
             _jwtOptions = jwtOptions.Value;
@@ -92,12 +97,19 @@ namespace AILogistics.Infrastructure.Services
             }
             else
             {
+                CustomerResponse? customer = await _customerService.GetCustomerById(request.CustomerId);
+
+                if (customer == null)
+                {
+                    throw new ArgumentException("Invalid customer Id");
+                }
 
                 User user = new User
                 {
                     FullName = request.FullName,
                     Email = request.Email.Trim().ToLowerInvariant(),
                     Role = UserRole.Customer,
+                    CustomerId = request.CustomerId,
                     CreatedAt = DateTime.UtcNow,
 
                 };
@@ -178,7 +190,7 @@ namespace AILogistics.Infrastructure.Services
             {
                 throw new AuthenticationException("Invalid refresh token. ");
             }
-            else if(refreshToken.IsExpired)
+            else if (refreshToken.IsExpired)
             {
                 throw new AuthenticationException("Refresh token has expired. ");
             }

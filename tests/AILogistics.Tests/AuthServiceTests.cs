@@ -16,12 +16,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AILogistics.Application.Interface;
+using AILogistics.Application.Customers;
 
 namespace AILogistics.Tests
 {
     public class AuthServiceTests
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<ICustomerService> _customerServiceMock;
         private readonly Mock<IPasswordHasher<User>> _passwordHasherMock;
         private readonly Mock<IJwtTokenGenerator> _jwtTokenGeneratorMock;
         private readonly AuthService _authService;
@@ -29,6 +32,7 @@ namespace AILogistics.Tests
         public AuthServiceTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
+            _customerServiceMock = new Mock<ICustomerService>();
             _passwordHasherMock = new Mock<IPasswordHasher<User>>();
             _jwtTokenGeneratorMock = new Mock<IJwtTokenGenerator>();
             var jwtOptions = Options.Create(new JwtOptions
@@ -41,6 +45,7 @@ namespace AILogistics.Tests
             });
             _authService = new AuthService(
                 _userRepositoryMock.Object,
+                _customerServiceMock.Object,
                 _passwordHasherMock.Object,
                 _jwtTokenGeneratorMock.Object,
                 jwtOptions);
@@ -77,12 +82,21 @@ namespace AILogistics.Tests
                 FullName = "Test User",
                 Email = "test@gmail.com",
                 Password = "Password321!",
+                CustomerId = 1
 
             };
 
             _userRepositoryMock
                 .Setup(x => x.EmailExistsAsync("test@gmail.com"))
                 .ReturnsAsync(false);
+
+            _customerServiceMock
+                .Setup(c => c.GetCustomerById(request.CustomerId))
+                .ReturnsAsync(new CustomerResponse
+                {
+                    Id = request.CustomerId,
+                    CompanyName = "test Customer"
+                });
 
             _passwordHasherMock
                 .Setup(p => p.HashPassword(It.IsAny<User>(), request.Password))
@@ -103,11 +117,21 @@ namespace AILogistics.Tests
                 FullName = "Test User",
                 Email = "test@gmail.com",
                 Password = "Password321!",
+                CustomerId = 1
             };
 
             _userRepositoryMock
                 .Setup(x => x.EmailExistsAsync("test@gmail.com"))
                 .ReturnsAsync(false);
+
+            _customerServiceMock
+                .Setup(c => c.GetCustomerById(request.CustomerId))
+                .ReturnsAsync(new CustomerResponse
+                {
+                    Id = request.CustomerId,
+                    CompanyName = "Test Customer",
+
+                });
 
             _passwordHasherMock
                 .Setup(p => p.HashPassword(It.IsAny<User>(), request.Password))
@@ -118,6 +142,41 @@ namespace AILogistics.Tests
             _passwordHasherMock
                 .Verify(x => x.HashPassword(It.IsAny<User>(), request.Password),
                 Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_InvalidCustomerId_ThrowsArgumentException()
+        {
+            var request = new RegisterRequestDto
+            {
+                FullName = "Test User",
+                Email = "test@example.com",
+                Password = "password@123!",
+                CustomerId = 1
+            };
+
+            _userRepositoryMock
+                .Setup(x=>x.EmailExistsAsync(request.Email))
+                .ReturnsAsync(false);
+
+            _customerServiceMock
+                .Setup(c => c.GetCustomerById(request.CustomerId))
+                .ReturnsAsync((CustomerResponse?)null);
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => _authService.RegisterAsync(request));
+
+            Assert.Equal("Invalid customer Id", exception.Message);
+
+            _userRepositoryMock
+                .Verify(x => x.AddAsync(It.IsAny<User>()),
+                Times.Never);
+
+            _passwordHasherMock.Verify(
+                x => x.HashPassword(
+                    It.IsAny<User>(),
+                    It.IsAny<string>()),
+                Times.Never);
         }
 
         [Fact]

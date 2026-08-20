@@ -19,6 +19,9 @@ namespace AILogistics.Domain.Entities
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; } = UserRole.Customer;
 
+        public int? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
+
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

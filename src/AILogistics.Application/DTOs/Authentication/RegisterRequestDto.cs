@@ -20,5 +20,7 @@ namespace AILogistics.Application.DTOs.Authentication
             ErrorMessage = "Password must contain upper-case, lower-case, numeric, and special characters.")]
         public string Password { get; set; }
 
+        public int CustomerId { get; set; }
+
     }
 }

@@ -33,6 +33,11 @@ namespace AILogistics.Infrastructure.Authentication
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
+            if(user.CustomerId.HasValue)
+            {
+                claims.Add(new Claim("customerId", user.CustomerId.Value.ToString()));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 
             var credentials = new SigningCredentials
